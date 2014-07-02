@@ -20,6 +20,9 @@
   "dependencies" : {
     "request"   : "2.36.0"
   },
+  "devDependencies": {
+  	"vows": "0.7.x"
+  },
   "engines" : {
     "node" : ">=0.8",
     "npm" : ">=1.0.0"
