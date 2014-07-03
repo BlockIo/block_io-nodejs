@@ -15,16 +15,16 @@ It's super easy to get started. In your node shell, do:
 ```javascript
 var BlockIo = require('block_io');
 
-var blockio = new BlockIo('API_KEY');
+var block_io = new BlockIo('API_KEY');
 
 // print the account balance
-blockio.get_balance(console.log);
+block_io.get_balance(console.log);
 
 // print all addresses on this account
-blockio.get_my_addresses(console.log);
+block_io.get_my_addresses(console.log);
 
 // print the response of a withdrawal request
-blockio.withdraw({ pin: 'SECRET_PIN', from_user_ids: '1,2', to_user_id: '0', amount: '50.0' }, console.log);
+block_io.withdraw({ pin: 'SECRET_PIN', from_user_ids: '1,2', to_user_id: '0', amount: '50.0' }, console.log);
 ```
 
 For more information, see [Node.js API Docs](https://block.io/api/nodejs). This client provides a mapping for all methods listed on the Block.io API site.
