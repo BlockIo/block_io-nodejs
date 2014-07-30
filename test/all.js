@@ -17,7 +17,7 @@ vows.describe("block.io node.js api wrapper").addBatch({
       assert.isObject(res.data);
       assert.isArray(res.data.addresses);
       assert.isString(res.data.addresses[0].address);
-      assert.isString(res.data.addresses[0].address_label);
+      assert.isString(res.data.addresses[0].label);
     }
   })
 }).addBatch({
