@@ -47,3 +47,13 @@ site.
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
+
+
+## Testing
+
+We use [vows](http://vowsjs.org/) for unit tests. To run the tests you need to 
+specify API_KEY and ADDRESS environment variables. Syntax:
+
+```bash
+API_KEY="YOUR_API_KEY" ADDRESS="YOUR_ADDRESS" npm test
+```
