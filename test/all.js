@@ -4,12 +4,21 @@ var assert = require('assert');
 var BlockIo = require('../lib/block_io');
 var API_KEY = process.env.API_KEY;
 var ADDRESS = process.env.ADDRESS;
+var LABEL = (new Date).getTime().toString(36);
 
 var client = new BlockIo(API_KEY);
 
 vows.describe("block.io node.js api wrapper").addBatch({
   "get_balance": makeMethodCase('get_balance', {}),
-  "get_new_address": makeMethodCase('get_new_address', {})
+  "get_new_address": makeMethodCase('get_new_address', {}),
+  "get_new_address (with label)": makeMethodCase('get_new_address', {label: LABEL}, {
+    "must return the label": function (err, res) {
+      assert.isObject(res);
+      assert.isObject(res.data);
+      assert.isString(res.data.address);
+      assert.strictEqual(res.data.label, LABEL);
+    }
+  })
 }).addBatch({
   "get_my_addresses": makeMethodCase('get_my_addresses', {}, {
     "must return an address": function (err, res) {
@@ -28,7 +37,15 @@ vows.describe("block.io node.js api wrapper").addBatch({
       assert.isString(res.data.confirmed_received);
       assert.isString(res.data.unconfirmed_received);
     }
-  })
+  }),
+  "get_address_received (by label)": makeMethodCase('get_address_received', {label: LABEL}, {
+    "must return balance data": function (err, res) {
+      assert.isObject(res);
+      assert.isObject(res.data);
+      assert.isString(res.data.confirmed_received);
+      assert.isString(res.data.unconfirmed_received);
+    }
+  }),
 }).export(module);
 
 function makeMethodCase (method, args, customChecks) {
