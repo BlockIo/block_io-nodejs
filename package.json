@@ -2,7 +2,7 @@
   "name" : "block_io",
   "description" : "Block.io API wrapper for node.js",
   "keywords" : [ "block.io", "block_io", "bitcoin", "litecoin", "dogecoin", "wallet" ],
-  "version" : "0.1.1",
+  "version" : "0.2.0",
   "preferGlobal" : false,
   "homepage" : "https://github.com/BlockIo/block_io-nodejs",
   "author" : "Patrick Lodder <patrick.lodder@gmail.com> (https://github.com/patricklodder)",
