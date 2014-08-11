@@ -48,12 +48,12 @@ site.
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
 
-
 ## Testing
 
 We use [vows](http://vowsjs.org/) for unit tests. To run the tests you need to 
-specify API_KEY and ADDRESS environment variables. Syntax:
+specify BLOCK_IO_API_KEY and BLOCK_IO_ADDRESS environment variables. 
+**DO NOT USE PRODUCTION CREDENTIALS FOR UNIT TESTING!** Syntax:
 
 ```bash
-API_KEY="YOUR_API_KEY" ADDRESS="YOUR_ADDRESS" npm test
+BLOCK_IO_API_KEY="API_KEY" BLOCK_IO_PIN="SECRET_PIN" npm test
 ```
