@@ -42,7 +42,7 @@ site.
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/block_io-nodejs/fork )
+1. Fork it ( https://github.com/BlockIo/block_io-nodejs/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
@@ -51,8 +51,11 @@ site.
 ## Testing
 
 We use [vows](http://vowsjs.org/) for unit tests. To run the tests you need to 
-specify BLOCK_IO_API_KEY and BLOCK_IO_ADDRESS environment variables. 
-**DO NOT USE PRODUCTION CREDENTIALS FOR UNIT TESTING!** Syntax:
+specify ```BLOCK_IO_API_KEY``` and ```BLOCK_IO_ADDRESS``` environment variables. 
+
+**DO NOT USE PRODUCTION CREDENTIALS FOR UNIT TESTING!** 
+
+Test syntax:
 
 ```bash
 BLOCK_IO_API_KEY="API_KEY" BLOCK_IO_PIN="SECRET_PIN" npm test
