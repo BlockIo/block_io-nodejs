@@ -6,8 +6,9 @@ var BlockIo = require('../lib/block_io');
 
 var API_KEY = process.env.BLOCK_IO_API_KEY;
 var PIN = process.env.BLOCK_IO_PIN;
+var VERSION = process.env.BLOCK_IO_VERSION || 1;
 var FEES = {BTC: 0.0001, BTCTEST: 0.0001, DOGE: 1, DOGETEST: 1, LTC: 0.001, LTCTEST: 0.001};
-var NEWLABEL = (new Date).getTime().toString(36);
+var NEWLABEL = (new Date()).getTime().toString(36);
 
 if (!API_KEY || !PIN) {
   console.log('ERROR: Need valid BLOCK_IO_API_KEY and BLOCK_IO_PIN environment variables!');
@@ -18,12 +19,16 @@ if (!API_KEY || !PIN) {
   process.exit(1);
 }
 
-var client = new BlockIo(API_KEY);
+var client = new BlockIo({api_key: API_KEY, version: VERSION});
 
-vows.describe("block.io node.js api wrapper").addBatch({
+var spec = vows.describe("block.io node.js api wrapper");
+
+spec.addBatch({
   "get_balance": makeMethodCase('get_balance', {}),
   "get_new_address": makeMethodCase('get_new_address', {})
-}).addBatch({
+});
+
+spec.addBatch({
   "get_new_address (with label)": makeMethodCase('get_new_address', {label: NEWLABEL}, {
     "must return an address": function (err, res) {
       assert.isObject(res);
@@ -37,7 +42,9 @@ vows.describe("block.io node.js api wrapper").addBatch({
       assert.strictEqual(res.data.label, NEWLABEL);
     }
   })
-}).addBatch({
+});
+
+spec.addBatch({
   "get_my_addresses": makeMethodCase('get_my_addresses', {}, {
     "must specify a network": function (err, res) {
       assert.isObject(res);
@@ -69,7 +76,10 @@ vows.describe("block.io node.js api wrapper").addBatch({
       }
     }
   })
-}).addBatch({
+});
+
+// depreciated after v1:
+if (VERSION == 1) spec.addBatch({
   "get_address_received (by address)": makeMethodCase(
     'get_address_received',
     { address: cache.lazy('fromAddress') },
@@ -93,8 +103,39 @@ vows.describe("block.io node.js api wrapper").addBatch({
         assert.isString(res.data.unconfirmed_received);
       }
     }
+  )
+});
+
+
+// specific for > v1:
+if (VERSION > 1) spec.addBatch({
+  "get_address_balance (by address)": makeMethodCase(
+    'get_address_balance',
+    { address: cache.lazy('fromAddress') },
+    {
+      "must return balance data": function (err, res) {
+        assert.isObject(res);
+        assert.isObject(res.data);
+        assert.isString(res.data.available_balance);
+        assert.isString(res.data.pending_received_balance);
+      }
+    }
   ),
-}).addBatch({
+  "get_address_balance (received, by label)": makeMethodCase(
+    'get_address_balance',
+    { label: cache.lazy('fromLabel'), type: 'received'  },
+    {
+      "must return balance data": function (err, res, r) {
+        assert.isObject(res);
+        assert.isObject(res.data);
+        assert.isString(res.data.available_balance);
+        assert.isString(res.data.pending_received_balance);
+      }
+    }
+  )
+});
+
+spec.addBatch({
   "withdraw_from_address": makeMethodCase(
     'withdraw_from_address',
     {
@@ -105,7 +146,9 @@ vows.describe("block.io node.js api wrapper").addBatch({
     },
     makeTxAssertions()
   )
-}).addBatch({
+});
+
+spec.addBatch({
   "withdraw_from_label": makeMethodCase(
     'withdraw_from_label',
     {
@@ -116,7 +159,9 @@ vows.describe("block.io node.js api wrapper").addBatch({
     },
     makeTxAssertions()
   )
-}).export(module);
+});
+
+spec.export(module);
 
 function makeMethodCase (method, args, customChecks) {
   var testCase = {
@@ -133,7 +178,7 @@ function makeMethodCase (method, args, customChecks) {
     "must not return an error": function (err, data) {
       assert.isNull(err);
     },
-    "must return status 'success'": function (err, data) {
+    "must return status 'success'": function (err, data, res) {
       assert.isObject(data);
       assert.equal(data.status, 'success');
     }
