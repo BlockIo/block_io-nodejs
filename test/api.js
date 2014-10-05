@@ -7,7 +7,7 @@ var BlockIo = require('../lib/block_io');
 
 var API_KEY = process.env.BLOCK_IO_API_KEY;
 var PIN = process.env.BLOCK_IO_PIN;
-var VERSION = process.env.BLOCK_IO_VERSION || 1;
+var VERSION = process.env.BLOCK_IO_VERSION || BlockIo.DEFAULT_VERSION;
 var SERVER = process.env.BLOCK_IO_SERVER || '';
 var NEWLABEL = (new Date()).getTime().toString(36);
 
