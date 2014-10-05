@@ -51,7 +51,9 @@ site.
 ## Testing
 
 We use [vows](http://vowsjs.org/) for unit tests. To run the tests you need to 
-specify ```BLOCK_IO_API_KEY``` and ```BLOCK_IO_PIN``` environment variables.
+specify ```BLOCK_IO_API_KEY``` and ```BLOCK_IO_PIN``` environment variables. The
+```BLOCK_IO_VERSION``` environment variable is optional and currently defaults
+to ```1```.
 
 **DO NOT USE PRODUCTION CREDENTIALS FOR UNIT TESTING!** 
 
