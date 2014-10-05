@@ -1,35 +1,29 @@
 var vows = require('vows');
 var assert = require('assert');
 var cache = require('./helpers/cache');
+var genericHelpers = require('./helpers/generic');
 
 var BlockIo = require('../lib/block_io');
 
 var API_KEY = process.env.BLOCK_IO_API_KEY;
 var PIN = process.env.BLOCK_IO_PIN;
 var VERSION = process.env.BLOCK_IO_VERSION || 1;
-var FEES = {BTC: 0.0001, BTCTEST: 0.0001, DOGE: 1, DOGETEST: 1, LTC: 0.001, LTCTEST: 0.001};
+var SERVER = process.env.BLOCK_IO_SERVER || '';
 var NEWLABEL = (new Date()).getTime().toString(36);
 
-if (!API_KEY || !PIN) {
-  console.log('ERROR: Need valid BLOCK_IO_API_KEY and BLOCK_IO_PIN environment variables!');
-  console.log([
-    '       provided: BLOCK_IO_API_KEY: "', API_KEY,
-    '"; BLOCK_IO_PIN: "', PIN ? '[masked]' : '', '"'
-  ].join(''));
-  process.exit(1);
-}
+if (process.env.DEBUG) process.on('uncaughtException', function (e) { console.log(e.stack); });
 
-var client = new BlockIo({api_key: API_KEY, version: VERSION});
+var client = new BlockIo({api_key: API_KEY, version: VERSION, server: SERVER});
 
 var spec = vows.describe("block.io node.js api wrapper");
 
 spec.addBatch({
-  "get_balance": makeMethodCase('get_balance', {}),
-  "get_new_address": makeMethodCase('get_new_address', {})
+  "get_balance": genericHelpers.makeMethodCase(client, 'get_balance', {}),
+  "get_new_address": genericHelpers.makeMethodCase(client, 'get_new_address', {})
 });
 
 spec.addBatch({
-  "get_new_address (with label)": makeMethodCase('get_new_address', {label: NEWLABEL}, {
+  "get_new_address (with label)": genericHelpers.makeMethodCase(client, 'get_new_address', {label: NEWLABEL}, {
     "must return an address": function (err, res) {
       assert.isObject(res);
       assert.isObject(res.data);
@@ -45,13 +39,13 @@ spec.addBatch({
 });
 
 spec.addBatch({
-  "get_my_addresses": makeMethodCase('get_my_addresses', {}, {
+  "get_my_addresses": genericHelpers.makeMethodCase(client, 'get_my_addresses', {}, {
     "must specify a network": function (err, res) {
       assert.isObject(res);
       assert.isObject(res.data);
       assert.isString(res.data.network);
-      assert.ok(FEES.hasOwnProperty(res.data.network));
-      cache('minFee', FEES[res.data.network]);
+      assert.ok(genericHelpers.FEES.hasOwnProperty(res.data.network));
+      cache('minFee', genericHelpers.FEES[res.data.network]);
     },
     "must return an address": function (err, res) {
       assert.isObject(res);
@@ -80,7 +74,8 @@ spec.addBatch({
 
 // depreciated after v1:
 if (VERSION == 1) spec.addBatch({
-  "get_address_received (by address)": makeMethodCase(
+  "get_address_received (by address)": genericHelpers.makeMethodCase(
+    client,
     'get_address_received',
     { address: cache.lazy('fromAddress') },
     {
@@ -92,7 +87,8 @@ if (VERSION == 1) spec.addBatch({
       }
     }
   ),
-  "get_address_received (by label)": makeMethodCase(
+  "get_address_received (by label)": genericHelpers.makeMethodCase(
+    client,
     'get_address_received',
     { label: cache.lazy('fromLabel') },
     {
@@ -109,7 +105,8 @@ if (VERSION == 1) spec.addBatch({
 
 // specific for > v1:
 if (VERSION > 1) spec.addBatch({
-  "get_address_balance (by address)": makeMethodCase(
+  "get_address_balance (by address)": genericHelpers.makeMethodCase(
+    client,
     'get_address_balance',
     { address: cache.lazy('fromAddress') },
     {
@@ -121,7 +118,8 @@ if (VERSION > 1) spec.addBatch({
       }
     }
   ),
-  "get_address_balance (received, by label)": makeMethodCase(
+  "get_address_balance (received, by label)": genericHelpers.makeMethodCase(
+    client,
     'get_address_balance',
     { label: cache.lazy('fromLabel'), type: 'received'  },
     {
@@ -136,98 +134,32 @@ if (VERSION > 1) spec.addBatch({
 });
 
 spec.addBatch({
-  "withdraw_from_address": makeMethodCase(
+  "withdraw_from_address": genericHelpers.makeMethodCase(
+    client,
     'withdraw_from_address',
     {
       from_addresses: cache.lazy('fromAddress'),
       to_label: NEWLABEL,
-      amount: calcWithdrawalAmount,
+      amount: genericHelpers.calcWithdrawalAmount,
       pin: PIN
     },
-    makeTxAssertions()
+    genericHelpers.makeTxAssertions()
   )
 });
 
 spec.addBatch({
-  "withdraw_from_label": makeMethodCase(
+  "withdraw_from_label": genericHelpers.makeMethodCase(
+    client,
     'withdraw_from_label',
     {
       from_labels: cache.lazy('fromLabel'),
       payment_address: cache.lazy('newAddress'),
-      amount: calcWithdrawalAmount,
+      amount: genericHelpers.calcWithdrawalAmount,
       pin: PIN
     },
-    makeTxAssertions()
+    genericHelpers.makeTxAssertions()
   )
 });
 
-spec.export(module);
+if (genericHelpers.checkEnv()) spec.export(module);
 
-function makeMethodCase (method, args, customChecks) {
-  var testCase = {
-    topic: function () {
-
-      // resolve lazy cached args
-      var resolvedArgs = {};
-      Object.keys(args).forEach(function (k) {
-        resolvedArgs[k] = (typeof(args[k]) === 'function')  ?
-          args[k]() : args[k];
-      });
-      client[method](resolvedArgs, this.callback);
-    },
-    "must not return an error": function (err, data) {
-      assert.isNull(err);
-    },
-    "must return status 'success'": function (err, data, res) {
-      assert.isObject(data);
-      assert.equal(data.status, 'success');
-    }
-  };
-
-  if (customChecks) Object.keys(customChecks).forEach(function (k) {
-    testCase[k] = customChecks[k];
-  });
-
-  return testCase;
-}
-
-function makeTxAssertions () {
-  return {
-    "must return a txid": function (err, res) {
-      assert.isObject(res);
-      assert.isObject(res.data);
-      assert.isString(res.data.txid);
-    },
-    "must return an amount_withdrawn": function (err, res) {
-      assert.isObject(res);
-      assert.isObject(res.data);
-      assert.isString(res.data.amount_withdrawn);
-      assert.ok(parseFloat(res.data.amount_withdrawn, 10) >= parseFloat(calcWithdrawalAmount(), 10));
-    },
-    "must return an amount_sent": function (err, res) {
-      assert.isObject(res);
-      assert.isObject(res.data);
-      assert.isString(res.data.txid);
-      assert.isString(res.data.amount_sent);
-      assert.ok(parseFloat(res.data.amount_sent, 10) == parseFloat(calcWithdrawalAmount(), 10));
-    },
-    "must return a network_fee": function (err, res) {
-      assert.isObject(res);
-      assert.isObject(res.data);
-      assert.isString(res.data.txid);
-      assert.isString(res.data.network_fee);
-      assert.ok(!isNaN(parseFloat(res.data.network_fee, 10)));
-    },
-    "must return a blockio_fee": function (err, res) {
-      assert.isObject(res);
-      assert.isObject(res.data);
-      assert.isString(res.data.txid);
-      assert.isString(res.data.blockio_fee);
-      assert.ok(!isNaN(parseFloat(res.data.blockio_fee, 10)));
-    }
-  };
-}
-
-function calcWithdrawalAmount () {
-  return (cache('minFee') * 3).toFixed(5);
-}
