@@ -18,7 +18,8 @@ It's super easy to get started. In your node shell, do:
 ```javascript
 var BlockIo = require('block_io');
 
-var block_io = new BlockIo('API_KEY');
+// 'SECRET_PIN' and 'VERSION' are optional
+var block_io = new BlockIo('API_KEY', 'SECRET_PIN', 'VERSION');
 
 // print the account balance
 block_io.get_balance(console.log);
@@ -27,11 +28,13 @@ block_io.get_balance(console.log);
 block_io.get_my_addresses(console.log);
 
 // print the response of a withdrawal request
+// 'SECRET_PIN' is only required if you did not specify it at 
+// class initialization time.
 block_io.withdraw(
   { 
     pin: 'SECRET_PIN', 
-    from_user_ids: '1,2', 
-    to_user_id: '0', 
+    from_labels: 'label1,label2', 
+    to_label: 'label3', 
     amount: '50.0' 
   }, console.log);
 ```
@@ -53,7 +56,7 @@ site.
 We use [vows](http://vowsjs.org/) for unit tests. To run the tests you need to 
 specify ```BLOCK_IO_API_KEY``` and ```BLOCK_IO_PIN``` environment variables. The
 ```BLOCK_IO_VERSION``` environment variable is optional and currently defaults
-to ```1```.
+to ```2```.
 
 **DO NOT USE PRODUCTION CREDENTIALS FOR UNIT TESTING!** 
 
