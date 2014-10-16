@@ -13,6 +13,7 @@ var API_KEY = process.env.BLOCK_IO_API_KEY;
 var PIN = process.env.BLOCK_IO_PIN;
 var VERSION = process.env.BLOCK_IO_VERSION || BlockIo.DEFAULT_VERSION;
 var SERVER = process.env.BLOCK_IO_SERVER || '';
+var PORT = process.env.BLOCK_IO_PORT || '';
 var FEES = {BTC: 0.0001, BTCTEST: 0.0001, DOGE: 1, DOGETEST: 1, LTC: 0.001, LTCTEST: 0.001};
 var DTRUSTLABEL = ((new Date()).getTime() + 11).toString(36);
 
@@ -31,7 +32,7 @@ var SIG_ADDRS = [
   'nUknbqqhSXHATS7SMH7wqf9e9tJcEZb3HY'
 ];
 
-var client = new BlockIo({api_key: API_KEY, version: VERSION, server: SERVER});
+var client = new BlockIo({api_key: API_KEY, version: VERSION, server: SERVER, port: PORT});
 
 var spec = vows.describe("block.io distributed trust api");
 
