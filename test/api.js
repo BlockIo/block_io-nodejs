@@ -9,11 +9,14 @@ var API_KEY = process.env.BLOCK_IO_API_KEY;
 var PIN = process.env.BLOCK_IO_PIN;
 var VERSION = process.env.BLOCK_IO_VERSION || BlockIo.DEFAULT_VERSION;
 var SERVER = process.env.BLOCK_IO_SERVER || '';
+var PORT = process.env.BLOCK_IO_PORT || '';
 var NEWLABEL = (new Date()).getTime().toString(36);
 
 if (process.env.DEBUG) process.on('uncaughtException', function (e) { console.log(e.stack); });
 
-var client = new BlockIo({api_key: API_KEY, version: VERSION, server: SERVER});
+var client = new BlockIo({api_key: API_KEY, version: VERSION, server: SERVER, port: PORT});
+
+console.log('URL:', client._constructURL(''));
 
 var spec = vows.describe("block.io node.js api wrapper");
 
