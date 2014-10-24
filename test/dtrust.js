@@ -147,6 +147,7 @@ spec.addBatch({
         assert.isString(res.data.reference_id);
         assert.isArray(res.data.inputs);
         assert.isNull(res.data.encrypted_passphrase);
+        cache('dtrustWithdrawal', res);
       },
       "must require the correct amounts of sigs": function (err, res) {
         assert.isObject(res);
@@ -155,56 +156,116 @@ spec.addBatch({
         res.data.inputs.forEach(function (input) {
           assert.strictEqual(input.signatures_needed, REQUIRED_SIGS);
         });
-      },
-      "when signed with 1 key": {
-        topic: function (res) {
-          res.data.inputs = BlockIo.helper.signInputs(KEYS[0], res.data.inputs);
-          var cb = this.callback;
-          var _cb = function (err, nextRes) {
-            cb(err, nextRes, res);
-          }
-          client.sign_and_finalize_withdrawal({signature_data: JSON.stringify(res.data)}, _cb);
-        },
-        "must return the correct reference_id": function (err, res1, res2) {
-          assert.isObject(res1);
-          assert.isObject(res1.data);
-          assert.isString(res1.data.reference_id);
-          assert.isObject(res2);
-          assert.isObject(res2.data);
-          assert.isString(res2.data.reference_id);
-          assert.strictEqual(res1.data.reference_id, res2.data.reference_id)
-        },
-        "must have decreased the amount of required sigs": function (err, res1, res2) {
-          assert.isObject(res1);
-          assert.isObject(res1.data);
-          assert.isArray(res1.data.inputs);
-          res1.data.inputs.forEach(function (input) {
-            assert.strictEqual(input.signatures_needed, REQUIRED_SIGS - 1);
-          });
-        }
-      },
-      "when signed with 2 keys": (function () {
-        var testCase = {
-          topic: function (res) {
-            res.data.inputs = BlockIo.helper.signInputs(KEYS[0], res.data.inputs);
-            res.data.inputs = BlockIo.helper.signInputs(KEYS[2], res.data.inputs);
-            var cb = this.callback;
-            var _cb = function (err, nextRes) {
-              cb(err, nextRes, res);
-            }
-
-            client.sign_and_finalize_withdrawal({signature_data: JSON.stringify(res.data)}, _cb);
-          }
-        };
-        var txchk = genericHelpers.makeTxAssertions();
-        Object.keys(txchk).forEach(function (k) {
-          testCase[k] = txchk[k];
-        });
-
-        return testCase;
-      })()
+      }
     }
   )
+});
+
+spec.addBatch({
+  "Given a cached sign request": {
+    topic: cache.lazy('dtrustWithdrawal'),
+
+    "must be a valid request": function (res) {
+      if (!res) process.exit();
+      assert.isObject(res);
+      assert.isObject(res.data);
+      assert.isString(res.data.reference_id);
+      assert.isArray(res.data.inputs);
+      assert.isNull(res.data.encrypted_passphrase);
+    },
+    "when signed with 1 key": {
+      topic: function (res) {
+        res.data.inputs = BlockIo.helper.signInputs(KEYS[0], res.data.inputs);
+
+        var cb = this.callback;
+        var _cb = function (err, nextRes) { cb(err, nextRes, res); };
+
+        client.sign_and_finalize_withdrawal({signature_data: JSON.stringify(res.data)}, _cb);
+      },
+      "must not return an error": function (err, data) {
+        if (process.env.DEBUG && err) console.log(data);
+        assert.isNull(err);
+      },
+      "must return status 'success'": function (err, data) {
+        assert.isObject(data);
+        if (process.env.DEBUG && data.status != 'success') console.log(data);
+        assert.equal(data.status, 'success');
+      },
+      "must return the correct reference_id": function (err, res1, res2) {
+        assert.isObject(res1);
+        assert.isObject(res1.data);
+        assert.isString(res1.data.reference_id);
+        assert.isObject(res2);
+        assert.isObject(res2.data);
+        assert.isString(res2.data.reference_id);
+        assert.strictEqual(res1.data.reference_id, res2.data.reference_id);
+      },
+      "must have decreased the amount of required sigs": function (err, res1, res2) {
+        assert.isObject(res1);
+        assert.isObject(res1.data);
+        assert.isArray(res1.data.inputs);
+        res1.data.inputs.forEach(function (input) {
+          assert.strictEqual(input.signatures_needed, REQUIRED_SIGS - 1);
+        });
+      }
+    }
+
+  }
+});
+
+spec.addBatch({
+  "Given a cached sign request": {
+    topic: cache.lazy('dtrustWithdrawal'),
+    "when signed with 2 keys": (function () {
+      var testCase = {
+        topic: function (res) {
+          res.data.inputs = BlockIo.helper.signInputs(KEYS[0], res.data.inputs);
+          res.data.inputs = BlockIo.helper.signInputs(KEYS[2], res.data.inputs);
+
+          var cb = this.callback;
+          var _cb = function (err, nextRes) { cb(err, nextRes, res); };
+
+          client.sign_and_finalize_withdrawal({signature_data: JSON.stringify(res.data)}, _cb);
+        }
+      };
+      var txchk = genericHelpers.makeTxAssertions();
+      Object.keys(txchk).forEach(function (k) {
+        testCase[k] = txchk[k];
+      });
+
+      return testCase;
+    })()
+  }
+});
+
+spec.addBatch({
+  "Given a cached but expired sign request": {
+    topic: cache.lazy('dtrustWithdrawal'),
+    "when signed with 1 key": {
+      topic: function (res) {
+        res.data.inputs = BlockIo.helper.signInputs(KEYS[0], res.data.inputs);
+
+        var cb = this.callback;
+        var _cb = function (err, nextRes) { cb(err, nextRes, res); };
+
+        client.sign_and_finalize_withdrawal({signature_data: JSON.stringify(res.data)}, _cb);
+      },
+      "must not return an error": function (err, data) {
+        if (process.env.DEBUG && err) console.log(data);
+        assert.isNull(err);
+      },
+      "must return status 'fail'": function (err, data) {
+        assert.isObject(data);
+        if (process.env.DEBUG && data.status != 'fail') console.log(data);
+        assert.equal(data.status, 'fail');
+      },
+      "must return an error message": function (err, data) {
+        assert.isString(data.data.error_message);
+        assert.ok(/reference_id/.test(data.data.error_message));
+        assert.ok(/no\slonger\svalid/.test(data.data.error_message));
+      }
+    }
+  }
 });
 
 if (genericHelpers.checkEnv()) spec.export(module);
