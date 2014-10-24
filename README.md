@@ -43,6 +43,14 @@ For more information, see [Node.js API Docs](https://block.io/api/nodejs).
 This client provides a mapping for all methods listed on the Block.io API 
 site.
 
+## Browser Library
+
+To build the browser library, run:
+
+```bash
+npm run-script compile
+```
+
 ## Contributing
 
 1. Fork it ( https://github.com/BlockIo/block_io-nodejs/fork )
