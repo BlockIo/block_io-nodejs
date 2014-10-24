@@ -161,5 +161,44 @@ spec.addBatch({
   )
 });
 
+
+if (VERSION == 1) spec.addBatch({
+  "withdraw_from_address (without PIN, v1)": {
+    topic: function () {
+      client.pin = null;
+      client.aesKey = null;
+      client.withdraw_from_address({
+        from_labels: cache.lazy('fromAddress'),
+        payment_address: cache.lazy('newAddress'),
+        amount: genericHelpers.calcWithdrawalAmount,
+      }, this.callback);
+    },
+    "must return an error": function (err, res) {
+      assert.instanceOf(err, Error);
+    }
+  }
+});
+
+if (VERSION > 1) spec.addBatch({
+  "withdraw_from_address (without PIN, > v1)": genericHelpers.makeMethodCase(
+    client,
+    'withdraw_from_label',
+    {
+      from_labels: cache.lazy('fromLabel'),
+      payment_address: cache.lazy('newAddress'),
+      amount: genericHelpers.calcWithdrawalAmount,
+    },
+    {
+      "must return a transaction to sign": function (err, res, r) {
+        assert.isObject(res);
+        assert.isObject(res.data);
+        assert.isString(res.data.reference_id)
+        assert.isObject(res.data.encrypted_passphrase)
+        assert.isArray(res.data.inputs);
+      }
+    }
+  )
+});
+
 if (genericHelpers.checkEnv()) spec.export(module);
 
