@@ -14,7 +14,20 @@ var NEWLABEL = (new Date()).getTime().toString(36);
 
 if (process.env.DEBUG) process.on('uncaughtException', function (e) { console.log(e.stack); });
 
-var client = new BlockIo({api_key: API_KEY, version: VERSION, server: SERVER, port: PORT});
+var client = new BlockIo({
+  api_key: API_KEY,
+  version: VERSION,
+  server: SERVER,
+  port: PORT
+});
+
+var pinLessClient = new BlockIo({
+  api_key: API_KEY,
+  version: VERSION,
+  server: SERVER,
+  port: PORT,
+  options: { allowNoPin: true }
+});
 
 console.log('URL:', client._constructURL(''));
 
@@ -165,26 +178,27 @@ spec.addBatch({
 });
 
 
-if (VERSION == 1) spec.addBatch({
-  "withdraw_from_address (without PIN, v1)": {
+spec.addBatch({
+  "withdraw_from_address (without PIN)": {
     topic: function () {
       client.pin = null;
       client.aesKey = null;
       client.withdraw_from_address({
-        from_labels: cache.lazy('fromAddress'),
-        payment_address: cache.lazy('newAddress'),
-        amount: genericHelpers.calcWithdrawalAmount,
+        from_addresses: cache('fromAddress'),
+        payment_address: cache('newAddress'),
+        amount: genericHelpers.calcWithdrawalAmount(),
       }, this.callback);
     },
     "must return an error": function (err, res) {
+      if (process.env.DEBUG && !(err instanceof Error)) console.log(err, res)
       assert.instanceOf(err, Error);
     }
   }
 });
 
 if (VERSION > 1) spec.addBatch({
-  "withdraw_from_address (without PIN, > v1)": genericHelpers.makeMethodCase(
-    client,
+  "withdraw_from_address (with allowNoPin flag)": genericHelpers.makeMethodCase(
+    pinLessClient,
     'withdraw_from_label',
     {
       from_labels: cache.lazy('fromLabel'),
