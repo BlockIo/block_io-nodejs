@@ -9,11 +9,27 @@ var API_KEY = process.env.BLOCK_IO_API_KEY;
 var PIN = process.env.BLOCK_IO_PIN;
 var VERSION = process.env.BLOCK_IO_VERSION || BlockIo.DEFAULT_VERSION;
 var SERVER = process.env.BLOCK_IO_SERVER || '';
+var PORT = process.env.BLOCK_IO_PORT || '';
 var NEWLABEL = (new Date()).getTime().toString(36);
 
 if (process.env.DEBUG) process.on('uncaughtException', function (e) { console.log(e.stack); });
 
-var client = new BlockIo({api_key: API_KEY, version: VERSION, server: SERVER});
+var client = new BlockIo({
+  api_key: API_KEY,
+  version: VERSION,
+  server: SERVER,
+  port: PORT
+});
+
+var pinLessClient = new BlockIo({
+  api_key: API_KEY,
+  version: VERSION,
+  server: SERVER,
+  port: PORT,
+  options: { allowNoPin: true }
+});
+
+console.log('URL:', client._constructURL(''));
 
 var spec = vows.describe("block.io node.js api wrapper");
 
@@ -162,26 +178,27 @@ spec.addBatch({
 });
 
 
-if (VERSION == 1) spec.addBatch({
-  "withdraw_from_address (without PIN, v1)": {
+spec.addBatch({
+  "withdraw_from_address (without PIN)": {
     topic: function () {
       client.pin = null;
       client.aesKey = null;
       client.withdraw_from_address({
-        from_labels: cache.lazy('fromAddress'),
-        payment_address: cache.lazy('newAddress'),
-        amount: genericHelpers.calcWithdrawalAmount,
+        from_addresses: cache('fromAddress'),
+        payment_address: cache('newAddress'),
+        amount: genericHelpers.calcWithdrawalAmount(),
       }, this.callback);
     },
     "must return an error": function (err, res) {
+      if (process.env.DEBUG && !(err instanceof Error)) console.log(err, res)
       assert.instanceOf(err, Error);
     }
   }
 });
 
 if (VERSION > 1) spec.addBatch({
-  "withdraw_from_address (without PIN, > v1)": genericHelpers.makeMethodCase(
-    client,
+  "withdraw_from_address (with allowNoPin flag)": genericHelpers.makeMethodCase(
+    pinLessClient,
     'withdraw_from_label',
     {
       from_labels: cache.lazy('fromLabel'),
