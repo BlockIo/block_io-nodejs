@@ -268,4 +268,4 @@ spec.addBatch({
   }
 });
 
-if (genericHelpers.checkEnv()) spec.export(module);
+if (genericHelpers.checkEnv() && VERSION > 1) spec.export(module);
