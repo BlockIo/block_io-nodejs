@@ -250,14 +250,13 @@ spec.addBatch({
 
         client.sign_and_finalize_withdrawal({signature_data: JSON.stringify(res.data)}, _cb);
       },
-      "must not return an error": function (err, data) {
-        if (process.env.DEBUG && err) console.log(data);
-        assert.isNull(err);
+      "must return an error": function (err, data) {
+        assert.instanceOf(err, Error);
       },
       "must return status 'fail'": function (err, data) {
         assert.isObject(data);
         if (process.env.DEBUG && data.status != 'fail') console.log(data);
-        assert.equal(data.status, 'fail');
+        assert.equal('fail', data.status);
       },
       "must return an error message": function (err, data) {
         assert.isString(data.data.error_message);
