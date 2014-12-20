@@ -88,6 +88,25 @@ spec.addBatch({
   })
 });
 
+if (VERSION > 1) spec.addBatch({
+  'get_network_fee_estimate': genericHelpers.makeMethodCase(
+    client,
+    'get_network_fee_estimate',
+    {
+      from_address: cache.lazy('fromAddress'),
+      amounts: genericHelpers.calcWithdrawalAmount,
+      to_addresses: cache.lazy('newAddress')
+    },
+    {
+      "must return fee estimation data": function (err, res) {
+        assert.isObject(res);
+        assert.isObject(res.data);
+        assert.isString(res.data.estimated_network_fee);
+      }
+    }
+  )
+});
+
 // depreciated after v1:
 if (VERSION == 1) spec.addBatch({
   "get_address_received (by address)": genericHelpers.makeMethodCase(
