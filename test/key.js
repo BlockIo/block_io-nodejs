@@ -48,7 +48,7 @@ vows.describe("Block IO ECKey Additions").addBatch({
       },
       "must return the correct public key": function (k) {
         assert.strictEqual(k.pub.toHex(),'029023d9738c623cdd7e5fdd0f41666accb82f21df5d27dc5ef07040f7bdc5d9f5');
-      },
+      }
     }
   }
 }).export(module);

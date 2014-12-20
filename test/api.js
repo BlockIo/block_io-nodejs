@@ -205,11 +205,11 @@ spec.addBatch({
       client.withdraw_from_address({
         from_addresses: cache('fromAddress'),
         payment_address: cache('newAddress'),
-        amount: genericHelpers.calcWithdrawalAmount(),
+        amount: genericHelpers.calcWithdrawalAmount()
       }, this.callback);
     },
     "must return an error": function (err, res) {
-      if (process.env.DEBUG && !(err instanceof Error)) console.log(err, res)
+      if (process.env.DEBUG && !(err instanceof Error)) console.log(err, res);
       assert.instanceOf(err, Error);
     }
   }
@@ -222,14 +222,14 @@ if (VERSION > 1) spec.addBatch({
     {
       from_labels: cache.lazy('fromLabel'),
       payment_address: cache.lazy('newAddress'),
-      amount: genericHelpers.calcWithdrawalAmount,
+      amount: genericHelpers.calcWithdrawalAmount
     },
     {
       "must return a transaction to sign": function (err, res, r) {
         assert.isObject(res);
         assert.isObject(res.data);
-        assert.isString(res.data.reference_id)
-        assert.isObject(res.data.encrypted_passphrase)
+        assert.isString(res.data.reference_id);
+        assert.isObject(res.data.encrypted_passphrase);
         assert.isArray(res.data.inputs);
       }
     }
