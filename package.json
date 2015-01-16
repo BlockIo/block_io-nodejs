@@ -20,7 +20,7 @@
   "dependencies" : {
     "request"       : "=2.51.0",
     "bigi"          : "=1.4.0",
-    "bitcoinjs-lib" : "=1.4.2",
+    "bitcoinjs-lib" : "=1.4.3",
     "pbkdf2-sha256" : "=1.1.0"
   },
   "devDependencies": {
