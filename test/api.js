@@ -236,5 +236,106 @@ if (VERSION > 1) spec.addBatch({
   )
 });
 
-if (genericHelpers.checkEnv()) spec.export(module);
+if (VERSION > 1) spec.addBatch({
+  "archive_address": genericHelpers.makeMethodCase(
+    client,
+    'archive_address',
+    {
+      address: cache.lazy('newAddress')
+    },
+    {
+      "must echo the address we archived ": function (err, res, r) {
+        assert.isObject(res);
+        assert.isObject(res.data);
+        assert.isArray(res.data.addresses);
+        assert.ok(res.data.addresses.some(function (addr) {
+          return (
+            addr.address == cache('newAddress') && addr.archived
+          );
+        }));
+      },
+      "and then queried account addresses": genericHelpers.makeMethodCase(
+        client,
+        'get_my_addresses',
+        {},
+        {
+          "must not contain the archived address": function (err, res, r) {
+            assert.isObject(res);
+            assert.isObject(res.data);
+            assert.isArray(res.data.addresses);
+            assert.strictEqual(res.data.addresses.filter(function (addr) {
+              return addr.address == cache('newAddress');
+            }).length, 0);
+          }
+        }
+      ),
+      "and then queried archived addresses": genericHelpers.makeMethodCase(
+        client,
+        'get_my_archived_addresses',
+        {},
+        {
+          "must contain the archived address": function (err, res, r) {
+            assert.isObject(res);
+            assert.isObject(res.data);
+            assert.isArray(res.data.addresses);
+            assert.ok(res.data.addresses.some(function (addr) {
+              return addr.address == cache('newAddress');
+            }));
+          }
+        }
+      )
+    }
+  )
+});
 
+if (VERSION > 1) spec.addBatch({
+  "unarchive_address": genericHelpers.makeMethodCase(
+    client,
+    'unarchive_address',
+    {
+      address: cache.lazy('newAddress')
+    },
+    {
+      "must echo the address we unarchived ": function (err, res, r) {
+        assert.isObject(res);
+        assert.isObject(res.data);
+        assert.isArray(res.data.addresses);
+        assert.ok(res.data.addresses.some(function (addr) {
+          return (addr.address == cache('newAddress') && !addr.archived);
+        }));
+      },
+      "and then queried archived addresses": genericHelpers.makeMethodCase(
+        client,
+        'get_my_archived_addresses',
+        {},
+        {
+          "must not contain the unarchived address": function (err, res, r) {
+            assert.isObject(res);
+            assert.isObject(res.data);
+            assert.isArray(res.data.addresses);
+            assert.strictEqual(res.data.addresses.filter(function (addr) {
+              return addr.address == cache('newAddress');
+            }).length, 0);
+          }
+        }
+      ),
+      "and then queried account addresses": genericHelpers.makeMethodCase(
+        client,
+        'get_my_addresses',
+        {},
+        {
+          "must contain the unarchived address": function (err, res, r) {
+            assert.isObject(res);
+            assert.isObject(res.data);
+            assert.isArray(res.data.addresses);
+            assert.ok(res.data.addresses.some(function (addr) {
+              return addr.address == cache('newAddress');
+            }));
+          }
+        }
+      )
+    }
+  )
+});
+
+if (genericHelpers.checkEnv()) spec.export(module);
