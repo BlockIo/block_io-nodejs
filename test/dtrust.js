@@ -267,4 +267,106 @@ spec.addBatch({
   }
 });
 
+spec.addBatch({
+  "archive_dtrust_address": genericHelpers.makeMethodCase(
+    client,
+    'archive_dtrust_address',
+    {
+      address: cache.lazy('newDtrustAddress')
+    },
+    {
+      "must echo the address we archived ": function (err, res, r) {
+        assert.isObject(res);
+        assert.isObject(res.data);
+        assert.isArray(res.data.addresses);
+        assert.ok(res.data.addresses.some(function (addr) {
+          return (
+            addr.address == cache('newDtrustAddress') && addr.archived
+          );
+        }));
+      },
+      "and then queried dtrust addresses": genericHelpers.makeMethodCase(
+        client,
+        'get_my_dtrust_addresses',
+        {},
+        {
+          "must not contain the archived address": function (err, res, r) {
+            assert.isObject(res);
+            assert.isObject(res.data);
+            assert.isArray(res.data.addresses);
+            assert.strictEqual(res.data.addresses.filter(function (addr) {
+              return addr.address == cache('newDtrustAddress');
+            }).length, 0);
+          }
+        }
+      ),
+      "and then queried archived dtrust addresses": genericHelpers.makeMethodCase(
+        client,
+        'get_my_archived_dtrust_addresses',
+        {},
+        {
+          "must contain the archived address": function (err, res, r) {
+            assert.isObject(res);
+            assert.isObject(res.data);
+            assert.isArray(res.data.addresses);
+            assert.ok(res.data.addresses.some(function (addr) {
+              return addr.address == cache('newDtrustAddress');
+            }));
+          }
+        }
+      )
+    }
+  )
+});
+
+spec.addBatch({
+  "unarchive_dtrust_address": genericHelpers.makeMethodCase(
+    client,
+    'unarchive_dtrust_address',
+    {
+      address: cache.lazy('newDtrustAddress')
+    },
+    {
+      "must echo the address we unarchived ": function (err, res, r) {
+        assert.isObject(res);
+        assert.isObject(res.data);
+        assert.isArray(res.data.addresses);
+        assert.ok(res.data.addresses.some(function (addr) {
+          return (addr.address == cache('newDtrustAddress') && !addr.archived);
+        }));
+      },
+      "and then queried archived dtrust addresses": genericHelpers.makeMethodCase(
+        client,
+        'get_my_archived_dtrust_addresses',
+        {},
+        {
+          "must not contain the unarchived address": function (err, res, r) {
+            assert.isObject(res);
+            assert.isObject(res.data);
+            assert.isArray(res.data.addresses);
+            assert.strictEqual(res.data.addresses.filter(function (addr) {
+              return addr.address == cache('newDtrustAddress');
+            }).length, 0);
+          }
+        }
+      ),
+      "and then queried dtrust addresses": genericHelpers.makeMethodCase(
+        client,
+        'get_my_dtrust_addresses',
+        {},
+        {
+          "must contain the unarchived address": function (err, res, r) {
+            assert.isObject(res);
+            assert.isObject(res.data);
+            assert.isArray(res.data.addresses);
+            assert.ok(res.data.addresses.some(function (addr) {
+              return addr.address == cache('newDtrustAddress');
+            }));
+          }
+        }
+      )
+    }
+  )
+});
+
 if (genericHelpers.checkEnv() && VERSION > 1) spec.export(module);
