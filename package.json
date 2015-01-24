@@ -24,7 +24,7 @@
     "pbkdf2-sha256" : "=1.1.0"
   },
   "devDependencies": {
-  	"vows": "0.7.x"
+    "vows": "0.7.x"
   },
   "engines" : {
     "node" : ">=0.8",
