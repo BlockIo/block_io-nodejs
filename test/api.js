@@ -237,6 +237,75 @@ if (VERSION > 1) spec.addBatch({
 });
 
 if (VERSION > 1) spec.addBatch({
+  "get_transactions (received)": genericHelpers.makeMethodCase(
+    client,
+    'get_transactions',
+    {
+      type: 'received'
+    },
+    {
+      "must return an object containing transaction data": function (err, res, r) {
+        assert.isObject(res);
+        assert.isObject(res.data);
+        assert.isString(res.data.network);
+        assert.isArray(res.data.txs);
+      },
+      "may return transactions": function (err, res, r) {
+        assert.isObject(res);
+        assert.isObject(res.data);
+        assert.isArray(res.data.txs);
+
+        if (res.data.txs.length) res.data.txs.forEach(function (tx) {
+          assert.isObject(tx);
+          assert.isString(tx.txid);
+          assert.isBoolean(tx.from_green_address);
+          assert.isNumber(tx.confirmations);
+          assert.isArray(tx.amounts_received);
+          assert.isArray(tx.senders);
+          assert.isNumber(tx.confidence);
+        });
+
+      }
+    }
+  )
+});
+
+if (VERSION > 1) spec.addBatch({
+  "get_transactions (spent)": genericHelpers.makeMethodCase(
+    client,
+    'get_transactions',
+    {
+      type: 'sent'
+    },
+    {
+      "must return an object containing transaction data": function (err, res, r) {
+        assert.isObject(res);
+        assert.isObject(res.data);
+        assert.isString(res.data.network);
+        assert.isArray(res.data.txs);
+      },
+      "may return transactions": function (err, res, r) {
+        assert.isObject(res);
+        assert.isObject(res.data);
+        assert.isArray(res.data.txs);
+
+        if (res.data.txs.length) res.data.txs.forEach(function (tx) {
+          assert.isObject(tx);
+          assert.isString(tx.txid);
+          assert.isBoolean(tx.from_green_address);
+          assert.isNumber(tx.confirmations);
+          assert.isString(tx.total_amount_sent);
+          assert.isArray(tx.amounts_sent);
+          assert.isArray(tx.senders);
+          assert.isNumber(tx.confidence);
+        });
+
+      }
+    }
+  )
+});
+
+if (VERSION > 1) spec.addBatch({
   "archive_address": genericHelpers.makeMethodCase(
     client,
     'archive_address',
