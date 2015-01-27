@@ -129,6 +129,25 @@ spec.addBatch({
   )
 });
 
+spec.addBatch({
+  'get_dtrust_network_fee_estimate': genericHelpers.makeMethodCase(
+    client,
+    'get_dtrust_network_fee_estimate',
+    {
+      from_address: cache.lazy('fromDTrustAddress'),
+      amounts: genericHelpers.calcWithdrawalAmount,
+      to_addresses: cache.lazy('newDtrustAddress')
+    },
+    {
+      "must return fee estimation data": function (err, res) {
+        assert.isObject(res);
+        assert.isObject(res.data);
+        assert.isString(res.data.estimated_network_fee);
+      }
+    }
+  )
+});
+
 // withdraw
 spec.addBatch({
   "withdraw_from_dtrust_address": genericHelpers.makeMethodCase(
