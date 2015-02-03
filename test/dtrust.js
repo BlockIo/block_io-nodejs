@@ -4,6 +4,7 @@ var cache = require('./helpers/cache');
 var genericHelpers = require('./helpers/generic');
 
 var BlockIo = require('../lib/block_io');
+var Bitcoin = require('bitcoinjs-lib');
 
 genericHelpers.checkEnv();
 
@@ -68,6 +69,12 @@ spec.addBatch({
         assert.isObject(res.data);
         assert.isArray(res.data.additional_signers);
         assert.deepEqual(res.data.additional_signers, SIG_ADDRS);
+      },
+      "must return a valid redeem_script": function (err, res) {
+        assert.isObject(res);
+        assert.isObject(res.data);
+        assert.isString(res.data.redeem_script);
+        assert.ok(Bitcoin.Script.fromASM(res.data.redeem_script));
       }
     }
   )
