@@ -18,9 +18,9 @@
   },
   "main" : "./lib/block_io.js",
   "dependencies" : {
-    "request"       : "=2.51.0",
+    "request"       : "=2.53.0",
     "bigi"          : "=1.4.0",
-    "bitcoinjs-lib" : "=1.4.3",
+    "bitcoinjs-lib" : "=1.4.5",
     "pbkdf2-sha256" : "=1.1.0"
   },
   "devDependencies": {
