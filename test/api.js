@@ -29,9 +29,40 @@ var pinLessClient = new BlockIo({
   options: { allowNoPin: true }
 });
 
+var badApiKeyClient = new BlockIo({
+  api_key: "1111-1111-1111-1111",
+  version: VERSION,
+  server: SERVER,
+  port: PORT
+});
+
 console.log('URL:', client._constructURL(''));
 
 var spec = vows.describe("block.io node.js api wrapper");
+
+if (VERSION > 1) spec.addBatch({
+  "validate_api_key (valid)": genericHelpers.makeMethodCase(
+    client,
+    'validate_api_key',
+    {},
+    {
+      "must return the network": function (err, res) {
+        assert.isObject(res);
+        assert.isObject(res.data);
+        assert.isString(res.data.network);
+        cache('network', res.data.network);
+      }
+    }),
+  "validate_api_key (invalid)": {
+    topic: function () {
+      badApiKeyClient.validate_api_key({}, this.callback);
+    },
+    "must return an error": function (err, res) {
+      if (process.env.DEBUG && !(err instanceof Error)) console.log(err, res);
+      assert.instanceOf(err, Error);
+    }
+  }
+});
 
 spec.addBatch({
   "get_balance": genericHelpers.makeMethodCase(client, 'get_balance', {}),
