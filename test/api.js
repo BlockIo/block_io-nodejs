@@ -439,4 +439,49 @@ if (VERSION > 1) spec.addBatch({
   )
 });
 
+if (VERSION > 1) spec.addBatch({
+  "A random address": {
+    topic: function () {
+      var key = new BlockIo.ECKey();
+      var address = key.pub.getAddress(cache('network')).toString();
+      var wif = key.toWIF(cache('network'));
+
+      cache('sweepWIF', wif);
+      var callback = this.callback;
+
+      client.withdraw_from_address({
+        from_addresses: cache('fromAddress'),
+        payment_address: address,
+        pin: PIN,
+        amount: genericHelpers.calcWithdrawalAmount()
+      }, function (e, res) {
+        if (!res || typeof(res) !== 'object') res = {};
+        res._wif = wif;
+        callback(e, res);
+      });
+    },
+    "must not throw an error": function (e, res) {
+      assert.isNull(e);
+    },
+    "and sweep_from_address": genericHelpers.makeMethodCase(
+      client,
+      'sweep_from_address',
+      {
+        private_key: cache.lazy('sweepWIF'),
+        to_address: cache.lazy('fromAddress')
+      },
+      {
+        "must sweep the funds": function (e, res) {
+          assert.isObject(res);
+          assert.isObject(res.data);
+          assert.isString(res.data.txid);
+          assert.isString(res.data.amount_withdrawn);
+          assert.isString(res.data.amount_sent);
+          assert.isString(res.data.network_fee);
+        }
+      }
+    )
+  }
+});
+
 if (genericHelpers.checkEnv()) spec.export(module);
