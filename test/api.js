@@ -481,6 +481,33 @@ if (VERSION > 1) spec.addBatch({
         }
       }
     )
+  },
+  "sweep_from_address (without params)": {
+    topic: function () {
+      client.sweep_from_address({}, this.callback);
+    },
+    "must return an error": function (err, res) {
+      if (process.env.DEBUG && !(err instanceof Error)) console.log(err, res);
+      assert.instanceOf(err, Error);
+    }
+  },
+  "sweep_from_address (without to_address)": {
+    topic: function () {
+      client.sweep_from_address({private_key: BlockIo.ECKey().toWIF()}, this.callback);
+    },
+    "must return an error": function (err, res) {
+      if (process.env.DEBUG && !(err instanceof Error)) console.log(err, res);
+      assert.instanceOf(err, Error);
+    }
+  },
+  "sweep_from_address (with invalid WIFs)": {
+    topic: function () {
+      client.sweep_from_address({private_key: 'invaLidWiF', to_address: 'invaLidWiF'}, this.callback);
+    },
+    "must return an error": function (err, res) {
+      if (process.env.DEBUG && !(err instanceof Error)) console.log(err, res);
+      assert.instanceOf(err, Error);
+    }
   }
 });
 
