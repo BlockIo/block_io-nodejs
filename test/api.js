@@ -2,6 +2,7 @@ var vows = require('vows');
 var assert = require('assert');
 var cache = require('./helpers/cache');
 var genericHelpers = require('./helpers/generic');
+var networks = require('../lib/networks');
 
 var BlockIo = require('../lib/block_io');
 
@@ -50,7 +51,7 @@ if (VERSION > 1) spec.addBatch({
         assert.isObject(res);
         assert.isObject(res.data);
         assert.isString(res.data.network);
-        cache('network', res.data.network);
+        cache('network', networks.getNetwork(res.data.network));
       }
     }),
   "validate_api_key (invalid)": {
