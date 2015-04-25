@@ -2,6 +2,7 @@ var vows = require('vows');
 var assert = require('assert');
 var cache = require('./helpers/cache');
 var genericHelpers = require('./helpers/generic');
+var networks = require('../lib/networks');
 
 var BlockIo = require('../lib/block_io');
 
@@ -29,9 +30,40 @@ var pinLessClient = new BlockIo({
   options: { allowNoPin: true }
 });
 
+var badApiKeyClient = new BlockIo({
+  api_key: "1111-1111-1111-1111",
+  version: VERSION,
+  server: SERVER,
+  port: PORT
+});
+
 console.log('URL:', client._constructURL(''));
 
 var spec = vows.describe("block.io node.js api wrapper");
+
+if (VERSION > 1) spec.addBatch({
+  "validate_api_key (valid)": genericHelpers.makeMethodCase(
+    client,
+    'validate_api_key',
+    {},
+    {
+      "must return the network": function (err, res) {
+        assert.isObject(res);
+        assert.isObject(res.data);
+        assert.isString(res.data.network);
+        cache('network', networks.getNetwork(res.data.network));
+      }
+    }),
+  "validate_api_key (invalid)": {
+    topic: function () {
+      badApiKeyClient.validate_api_key({}, this.callback);
+    },
+    "must return an error": function (err, res) {
+      if (process.env.DEBUG && !(err instanceof Error)) console.log(err, res);
+      assert.instanceOf(err, Error);
+    }
+  }
+});
 
 spec.addBatch({
   "get_balance": genericHelpers.makeMethodCase(client, 'get_balance', {}),
@@ -405,6 +437,78 @@ if (VERSION > 1) spec.addBatch({
       )
     }
   )
+});
+
+if (VERSION > 1) spec.addBatch({
+  "A random address": {
+    topic: function () {
+      var key = new BlockIo.ECKey();
+      var address = key.pub.getAddress(cache('network')).toString();
+      var wif = key.toWIF(cache('network'));
+
+      cache('sweepWIF', wif);
+      var callback = this.callback;
+
+      client.withdraw_from_address({
+        from_addresses: cache('fromAddress'),
+        payment_address: address,
+        pin: PIN,
+        amount: genericHelpers.calcWithdrawalAmount()
+      }, function (e, res) {
+        if (!res || typeof(res) !== 'object') res = {};
+        res._wif = wif;
+        callback(e, res);
+      });
+    },
+    "must not throw an error": function (e, res) {
+      assert.isNull(e);
+    },
+    "and sweep_from_address": genericHelpers.makeMethodCase(
+      client,
+      'sweep_from_address',
+      {
+        private_key: cache.lazy('sweepWIF'),
+        to_address: cache.lazy('fromAddress')
+      },
+      {
+        "must sweep the funds": function (e, res) {
+          assert.isObject(res);
+          assert.isObject(res.data);
+          assert.isString(res.data.txid);
+          assert.isString(res.data.amount_withdrawn);
+          assert.isString(res.data.amount_sent);
+          assert.isString(res.data.network_fee);
+        }
+      }
+    )
+  },
+  "sweep_from_address (without params)": {
+    topic: function () {
+      client.sweep_from_address({}, this.callback);
+    },
+    "must return an error": function (err, res) {
+      if (process.env.DEBUG && !(err instanceof Error)) console.log(err, res);
+      assert.instanceOf(err, Error);
+    }
+  },
+  "sweep_from_address (without to_address)": {
+    topic: function () {
+      client.sweep_from_address({private_key: BlockIo.ECKey().toWIF()}, this.callback);
+    },
+    "must return an error": function (err, res) {
+      if (process.env.DEBUG && !(err instanceof Error)) console.log(err, res);
+      assert.instanceOf(err, Error);
+    }
+  },
+  "sweep_from_address (with invalid WIFs)": {
+    topic: function () {
+      client.sweep_from_address({private_key: 'invaLidWiF', to_address: 'invaLidWiF'}, this.callback);
+    },
+    "must return an error": function (err, res) {
+      if (process.env.DEBUG && !(err instanceof Error)) console.log(err, res);
+      assert.instanceOf(err, Error);
+    }
+  }
 });
 
 if (genericHelpers.checkEnv()) spec.export(module);
