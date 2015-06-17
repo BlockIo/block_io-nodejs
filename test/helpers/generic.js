@@ -124,6 +124,6 @@ var genericHelpers = module.exports = {
   },
 
   calcWithdrawalAmount: function () {
-    return (cache('minFee') * 3).toFixed(5);
+    return (cache('minFee') * 3).toFixed(8);
   }
 };
