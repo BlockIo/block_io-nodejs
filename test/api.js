@@ -247,6 +247,35 @@ spec.addBatch({
   }
 });
 
+// TEST PRIORITIZATION
+if (VERSION > 1) spec.addBatch({
+  "withdraw_from_label (with priority=medium)": genericHelpers.makeMethodCase(
+    client,
+    'withdraw_from_label',
+    {
+      from_labels: cache.lazy('fromLabel'),
+      payment_address: cache.lazy('newAddress'),
+      amount: genericHelpers.calcWithdrawalAmount,
+      pin: PIN,
+      priority: "medium"
+    },
+    genericHelpers.makeNetworkFeeAssertions("medium")
+  )
+}).addBatch({
+  "withdraw_from_label (with priority=high)": genericHelpers.makeMethodCase(
+    client,
+    'withdraw_from_label',
+    {
+      from_labels: cache.lazy('fromLabel'),
+      payment_address: cache.lazy('newAddress'),
+      amount: genericHelpers.calcWithdrawalAmount,
+      pin: PIN,
+      priority: "high"
+    },
+    genericHelpers.makeNetworkFeeAssertions("high")
+  )
+});
+
 if (VERSION > 1) spec.addBatch({
   "withdraw_from_address (with allowNoPin flag)": genericHelpers.makeMethodCase(
     pinLessClient,

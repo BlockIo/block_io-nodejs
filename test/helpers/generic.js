@@ -1,6 +1,7 @@
 var vows = require('vows');
 var assert = require('assert');
 var cache = require('./cache');
+var BlockIo = require('../../lib/block_io.js');
 
 var loggedEnvError = false;
 
@@ -103,6 +104,23 @@ var genericHelpers = module.exports = {
         assert.ok(!isNaN(parseFloat(res.data.blockio_fee, 10)));
       }
     };
+  },
+
+  makeNetworkFeeAssertions: function (fee) {
+    var multiplier = BlockIo.getFeeMultiplier(fee);
+
+    var assertions = this.makeTxAssertions();
+    assertions["must return the correct network fee"] = function (err, res) {
+      assert.isObject(res);
+      assert.isObject(res.data);
+      assert.isString(res.data.txid);
+      assert.isString(res.data.network_fee);
+      var fee = parseFloat(res.data.network_fee, 10)
+      assert.ok(!isNaN(fee));
+      assert.strictEqual((cache('minFee') * multiplier).toFixed(8), fee.toFixed(8));
+    }
+
+    return assertions;
   },
 
   calcWithdrawalAmount: function () {
