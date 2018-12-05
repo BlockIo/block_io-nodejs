@@ -22,9 +22,9 @@ var REQUIRED_SIGS = 2;
 
 // insecure keys for testing ;)
 var KEYS = [
-  BlockIo.ECKey.fromPassphrase(new Buffer('key1')),
-  BlockIo.ECKey.fromPassphrase(new Buffer('key2')),
-  BlockIo.ECKey.fromPassphrase(new Buffer('key3'))
+  BlockIo.ECKey.fromPassphrase(Buffer.from('key1')),
+  BlockIo.ECKey.fromPassphrase(Buffer.from('key2')),
+  BlockIo.ECKey.fromPassphrase(Buffer.from('key3'))
 ];
 
 var SIG_ADDRS = [

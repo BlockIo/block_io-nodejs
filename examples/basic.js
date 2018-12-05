@@ -11,7 +11,7 @@ var client = new BlockIo({
 
 client.get_new_address({label: 'testDest'}, function (error, data) {
   if (error) return console.log("Error occured:", error.message);
-  console.log(data);
+    console.log(JSON.stringify(data, null, 2));
 });
 
 // withdraw 3.5 TDOGE to our new address
@@ -23,7 +23,7 @@ client.withdraw_from_labels({
   pin: PIN
 }, function (error, data) {
   if (error) return console.log("Error occured:", error.message);
-  console.log(data);
+    console.log(JSON.stringify(data, null, 2));
 });
 
 // Show the address associated with the label 'default'
@@ -31,7 +31,7 @@ client.get_address_by_label({
   label: 'default'
 }, function (error, data) {
   if (error) return console.log("Error occured:", error.message);
-  console.log(data);
+    console.log(JSON.stringify(data, null, 2));
 });
 
 // Show transactions we sent
@@ -40,7 +40,7 @@ client.get_transactions({
   type: 'sent'
 }, function (error, data) {
   if (error) return console.log("Error occured:", error.message);
-  console.log(data);
+    console.log(JSON.stringify(data, null, 2));
 });
 
 // Show the current price with BTC
@@ -48,7 +48,7 @@ client.get_current_price({
   base_price: 'BTC'
 }, function (error, data) {
   if (error) return console.log("Error occured:", error.message);
-  console.log(data);
+    console.log(JSON.stringify(data, null, 2));
 });
 
 

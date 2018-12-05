@@ -10,6 +10,11 @@ up :)
 Install the package using npm:
 
     $ npm install block_io
+    
+For Nodejs < 5.10.0, please use:
+
+    $ npm install block_io@1.0.9-5
+
 
 ## Usage
 
