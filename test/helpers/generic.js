@@ -1,6 +1,7 @@
 var vows = require('vows');
 var assert = require('assert');
 var cache = require('./cache');
+var request = require('request');
 
 var loggedEnvError = false;
 
@@ -66,6 +67,42 @@ var genericHelpers = module.exports = {
     });
 
     return testCase;
+  },
+
+  waitForBalance: function (network, addr, interval, retries, callback) {
+
+    var ival = setInterval(function () {
+      var iter = retries;
+      var url = [
+        "https://chain.so/api/v2/get_address_balance",
+        network,
+        addr
+      ].join('/')
+
+      request.get(url, function (e,r,b) {
+        iter--;
+        var data, err = null;
+
+        function __cb(e,d) {
+          callback(e,d);
+          clearInterval(ival);
+        }
+
+        try {
+          data = JSON.parse(b);
+        } catch (err) {
+          return __cb(err, null);
+        }
+
+        if (data.data.confirmed_balance !== "0.00000000")
+          return __cb(null, data);
+
+        if (iter < 0)
+          return __cb(new Error("Maximum retries exceeded"), null);
+
+      });
+    }, interval);
+
   },
 
   makeTxAssertions: function () {

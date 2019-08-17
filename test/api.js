@@ -11,6 +11,7 @@ var PIN = process.env.BLOCK_IO_PIN;
 var VERSION = process.env.BLOCK_IO_VERSION || BlockIo.DEFAULT_VERSION;
 var SERVER = process.env.BLOCK_IO_SERVER || '';
 var PORT = process.env.BLOCK_IO_PORT || '';
+var INCLUDE_SLOW = process.env.BLOCK_IO_SLOW_TESTS || false;
 var NEWLABEL = (new Date()).getTime().toString(36);
 
 if (process.env.DEBUG) process.on('uncaughtException', function (e) { console.log(e.stack); });
@@ -51,6 +52,7 @@ if (VERSION > 1) spec.addBatch({
         assert.isObject(res);
         assert.isObject(res.data);
         assert.isString(res.data.network);
+        cache('networkName', res.data.network);
         cache('network', networks.getNetwork(res.data.network));
       }
     }),
@@ -247,6 +249,24 @@ spec.addBatch({
   }
 });
 
+if (["BTCTEST", "LTCTEST"].indexOf(cache('network')) !== -1) spec.addBatch({
+  "get_new_address (with WITNESS_V0)": genericHelpers.makeMethodCase(
+    pinLessClient,
+    "get_new_address",
+    {
+      address_type: "WITNESS_V0"
+    },
+    {
+      "must create a WITNESS_V0 address": function (err, res, r) {
+        assert.isObject(res);
+        assert.isObject(res.data);
+        assert.isString(res.data.address);
+        assert.equal(62, res.data.address.length);
+      }
+    }
+  )
+});
+
 if (VERSION > 1) spec.addBatch({
   "withdraw_from_address (with allowNoPin flag)": genericHelpers.makeMethodCase(
     pinLessClient,
@@ -439,7 +459,7 @@ if (VERSION > 1) spec.addBatch({
   )
 });
 
-if (VERSION > 1) spec.addBatch({
+if (VERSION > 1 && INCLUDE_SLOW) spec.addBatch({
   "A random address": {
     topic: function () {
       var key = new BlockIo.ECKey();
@@ -457,7 +477,11 @@ if (VERSION > 1) spec.addBatch({
       }, function (e, res) {
         if (!res || typeof(res) !== 'object') res = {};
         res._wif = wif;
-        callback(e, res);
+        genericHelpers.waitForBalance(cache('networkName'), address, 30000, 10, function (e) {
+          if (e) return callback(e);
+          callback(e, res);
+        });
+
       });
     },
     "must not throw an error": function (e, res) {
