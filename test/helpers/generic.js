@@ -6,7 +6,7 @@ var request = require('request');
 var loggedEnvError = false;
 
 var genericHelpers = module.exports = {
-  FEES: {BTC: 0.0001, BTCTEST: 0.0001, DOGE: 1, DOGETEST: 1, LTC: 0.001, LTCTEST: 0.001},
+  FEES: {BTC: 0.00001, BTCTEST: 0.00001, DOGE: 1, DOGETEST: 1, LTC: 0.0001, LTCTEST: 0.0001},
   checkEnv: function () {
     if (!process.env.BLOCK_IO_API_KEY || !process.env.BLOCK_IO_PIN) {
       if (!loggedEnvError) {

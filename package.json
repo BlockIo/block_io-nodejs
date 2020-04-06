@@ -9,7 +9,7 @@
     "dogecoin",
     "wallet"
   ],
-  "version": "2.0.2",
+  "version": "2.0.3",
   "preferGlobal": false,
   "homepage": "https://github.com/BlockIo/block_io-nodejs",
   "author": "Patrick Lodder <patrick.lodder@gmail.com> (https://github.com/patricklodder)",
@@ -31,7 +31,7 @@
     "pbkdf2": "=3.0.16"
   },
   "devDependencies": {
-    "vows": "^0.8.2"
+    "vows": "^0.8.3"
   },
   "engines": {
     "node": ">=5.10.1",
