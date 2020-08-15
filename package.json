@@ -25,25 +25,16 @@
   },
   "main": "./lib/block_io.js",
   "dependencies": {
-    "request": "=2.88.0",
     "bigi": "=1.4.2",
     "bitcoinjs-lib": "=1.5.6",
-    "pbkdf2": "=3.0.16"
+    "pbkdf2": "=3.0.16",
+    "request": "=2.88.0"
   },
   "devDependencies": {
-    "vows": "^0.8.3"
-  },
-  "engines": {
-    "node": ">=5.10.1",
-    "npm": ">=3.8.3"
+    "tape": "^5.0.1"
   },
   "scripts": {
-    "test": "node_modules/.bin/vows --spec test/*.js"
+    "test": "node test/unit/cryptohelper.js && node test/unit/key.js"
   },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/BlockIo/block_io-nodejs/raw/master/LICENSE"
-    }
-  ]
+  "license": "MIT"
 }
