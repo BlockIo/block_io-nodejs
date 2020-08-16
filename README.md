@@ -1,20 +1,25 @@
 # BlockIo
 
-This nodejs module is the official reference client for the Block.io payments 
-API. To use this, you will need the Dogecoin, Bitcoin, or Litecoin API key(s) 
-from <a href="https://block.io" target="_blank">Block.io</a>. Go ahead, sign 
+This nodejs module is the official reference SDK for the Block.io payments
+API. To use this, you will need the Bitcoin, Litecoin or Dogecoin API key(s)
+from <a href="https://block.io" target="_blank">block.io</a>. Go ahead, sign
 up :)
 
 ## Installation
 
 Install the package using npm:
 
-    $ npm install block_io
-    
-For Nodejs < 5.10.0, please use:
+```bash
+npm install block_io
+```
 
-    $ npm install block_io@1.0.9-5
+### Support for older node.js versions
 
+Currently, only node.js versions 10.0 and higher are supported.
+
+For node.js < 10.0.0, please use: `npm install block_io@2.0.3`
+
+For node.js < 5.10.0, please use: `npm install block_io@1.0.9-5`
 
 ## Usage
 
@@ -24,7 +29,7 @@ It's super easy to get started. In your node shell, do:
 var BlockIo = require('block_io');
 
 // 'SECRET_PIN' and 'VERSION' are optional
-var block_io = new BlockIo('API_KEY', 'SECRET_PIN', 'VERSION');
+var block_io = new BlockIo('API_KEY');
 
 // print the account balance
 block_io.get_balance(console.log);
@@ -33,19 +38,17 @@ block_io.get_balance(console.log);
 block_io.get_my_addresses(console.log);
 
 // print the response of a withdrawal request
-// 'SECRET_PIN' is only required if you did not specify it at 
-// class initialization time.
 block_io.withdraw(
-  { 
-    pin: 'SECRET_PIN', 
-    from_labels: 'label1,label2', 
-    to_label: 'label3', 
-    amount: '50.0' 
+  {
+    pin: 'SECRET_PIN',
+    from_labels: 'label1,label2',
+    to_label: 'label3',
+    amount: '50.0'
   }, console.log);
 ```
 
-For more information, see [Node.js API Docs](https://block.io/api/nodejs). 
-This client provides a mapping for all methods listed on the Block.io API 
+For more information, see [Node.js API Docs](https://block.io/api/nodejs).
+This client provides a mapping for all methods listed on the Block.io API
 site.
 
 ## Contributing
@@ -58,15 +61,15 @@ site.
 
 ## Testing
 
-We use [vows](http://vowsjs.org/) for unit tests. To run the tests you need to 
-specify ```BLOCK_IO_API_KEY``` and ```BLOCK_IO_PIN``` environment variables. The
-```BLOCK_IO_VERSION``` environment variable is optional and currently defaults
-to ```2```.
+We use [tape](https://www.npmjs.com/package/tape) for unit and integration
+tests. To run the unit tests simply run `npm test`.
 
-**DO NOT USE PRODUCTION CREDENTIALS FOR UNIT TESTING!** 
+To run the integration tests you need to specify ```BLOCK_IO_API_KEY``` and
+```BLOCK_IO_PIN``` environment variables.
 
-Test syntax:
+**DO NOT USE PRODUCTION CREDENTIALS FOR INTEGRATION TESTING!**
 
+Integration test syntax:
 ```bash
-BLOCK_IO_API_KEY="API_KEY" BLOCK_IO_PIN="SECRET_PIN" npm test
+BLOCK_IO_API_KEY="API_KEY" BLOCK_IO_PIN="SECRET_PIN" node test/integration/api.js
 ```
