@@ -15,7 +15,6 @@ const PIN = process.env.BLOCK_IO_PIN;
 const VERSION = process.env.BLOCK_IO_VERSION || BlockIo.DEFAULT_VERSION;
 const SERVER = process.env.BLOCK_IO_SERVER || '';
 const PORT = process.env.BLOCK_IO_PORT || '';
-const FEES = {BTC: 0.0001, BTCTEST: 0.0001, DOGE: 1, DOGETEST: 1, LTC: 0.001, LTCTEST: 0.001};
 const DTRUSTLABEL = ((new Date()).getTime() + 11).toString(36);
 
 const REQUIRED_SIGS = 2;
@@ -133,7 +132,7 @@ cache.require(['newDtrustAddress'], () => {
           args[1].data.addresses.filter(a => a.address == cache('newDtrustAddress')).length,
           0, 'must not contain archived address'
         ))
-        .postProcess(args => cache('archiveSubTest1DTrust', true))
+        .postProcess(() => cache('archiveSubTest1DTrust', true))
         .execute();
 
       CT.create(test, client).title('After Archive, Search Archived Address')
@@ -143,7 +142,7 @@ cache.require(['newDtrustAddress'], () => {
           args[1].data.addresses.some(a => a.address == cache('newDtrustAddress')),
           'must contain archived address'
         ))
-        .postProcess(args => cache('archiveSubTest2DTrust', true))
+        .postProcess(() => cache('archiveSubTest2DTrust', true))
         .execute();
 
     });
@@ -168,7 +167,7 @@ cache.require(['newDtrustAddress'], () => {
             args[1].data.addresses.filter(a => a.address == cache('newDtrustAddress')).length,
             0, 'must not contain archived address'
           ))
-          .postProcess(args => cache('unarchiveSubTest1DTrust', true))
+          .postProcess(() => cache('unarchiveSubTest1DTrust', true))
           .execute();
 
         CT.create(test, client).title('After Unarchive, Search Non-archived Address')
@@ -178,7 +177,7 @@ cache.require(['newDtrustAddress'], () => {
             args[1].data.addresses.some(a => a.address == cache('newDtrustAddress')),
             'must contain archived address'
           ))
-          .postProcess(args => cache('unarchiveSubTest2DTrust', true))
+          .postProcess(() => cache('unarchiveSubTest2DTrust', true))
           .execute();
 
       });

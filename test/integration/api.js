@@ -2,7 +2,6 @@ const test = require('tape');
 const cache = require('../helpers/cache');
 const helper = require('../helpers/generic');
 const CT = require('../helpers/clienttest');
-const networks = require('../../lib/networks');
 
 const BlockIo = require('../../lib/block_io');
 
@@ -11,7 +10,6 @@ const PIN = process.env.BLOCK_IO_PIN;
 const VERSION = process.env.BLOCK_IO_VERSION || BlockIo.DEFAULT_VERSION;
 const SERVER = process.env.BLOCK_IO_SERVER || '';
 const PORT = process.env.BLOCK_IO_PORT || '';
-const INCLUDE_SLOW = process.env.BLOCK_IO_SLOW_TESTS || false;
 const NEWLABEL = (new Date()).getTime().toString(36);
 
 if (process.env.DEBUG) process.on('uncaughtException', function (e) { console.log(e.stack); });
@@ -272,7 +270,7 @@ cache.require(['minFee', 'newAddress', 'fromAddress', 'fromLabel'], () => {
             args[1].data.addresses.filter(a => a.address == cache('newAddress')).length,
             0, 'must not contain archived address'
           ))
-          .postProcess(args => cache('archiveSubTest1Done', true))
+          .postProcess(() => cache('archiveSubTest1Done', true))
           .execute();
 
         CT.create(test, client).title('After Archive, Search Archived Address')
@@ -282,7 +280,7 @@ cache.require(['minFee', 'newAddress', 'fromAddress', 'fromLabel'], () => {
             args[1].data.addresses.some(a => a.address == cache('newAddress')),
             'must contain archived address'
           ))
-          .postProcess(args => cache('archiveSubTest2Done', true))
+          .postProcess(() => cache('archiveSubTest2Done', true))
           .execute();
 
       });

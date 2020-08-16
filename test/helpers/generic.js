@@ -2,7 +2,7 @@ var cache = require('./cache');
 
 var loggedEnvError = false;
 
-var genericHelpers = module.exports = {
+module.exports = {
   FEES: {BTC: 0.00001, BTCTEST: 0.00001, DOGE: 1, DOGETEST: 1, LTC: 0.0001, LTCTEST: 0.0001},
 
   checkEnv: function () {

@@ -89,7 +89,7 @@ ClientTest.prototype.postProcess = function (fn) {
 ClientTest.prototype.execute = function () {
   const test = this;
 
-  return new Promise((f,r) => {
+  return new Promise(f => {
     test.framework(test._title, t => {
       t.plan(1 + this._tests.length);
 

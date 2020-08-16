@@ -28,7 +28,7 @@ test('Encrypting some data', t => {
   test('Decrypting the encrypted data', t => {
     t.plan(2);
     t.doesNotThrow(() => {
-      dec = CryptoHelper.decrypt(enc, PIN_KEY)
+      const dec = CryptoHelper.decrypt(enc, PIN_KEY)
       t.equal(dec, CLEARTEXT, 'must return the correct cleartext');
     }, undefined, 'does not throw any Errors');
 

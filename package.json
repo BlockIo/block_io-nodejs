@@ -29,10 +29,11 @@
     "pbkdf2": "=3.0.16"
   },
   "devDependencies": {
+    "eslint": "^7.7.0",
     "tape": "^5.0.1"
   },
   "scripts": {
-    "test": "node test/unit/cryptohelper.js && node test/unit/key.js"
+    "test": "node test/unit/cryptohelper.js && node test/unit/key.js && npx eslint ."
   },
   "license": "MIT"
 }
