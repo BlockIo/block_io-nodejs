@@ -17,7 +17,7 @@ test('ECKey extensions: deriving a pubkey from hex', t => {
   let key;
   t.doesNotThrow(() => {
     key = Key.fromHex(PRIVKEY);
-    t.equal(key.pub.toHex(), PUBKEY, 'must return the correct pubkey');
+    t.equal(key.pub.toString('hex'), PUBKEY, 'must return the correct pubkey');
   }, undefined, 'must not throw any Errors');
 
   test('ECKey extensions: signing hexdata', t => {
@@ -36,8 +36,8 @@ test('ECKey extensions: deriving a pubkey from passphrase', t => {
   let key;
   t.doesNotThrow(() => {
     key = Key.fromPassphrase(PASSPHRASE);
-    t.equal(key.d.toBuffer().toString('hex'), PASS_PRIV, 'must return the correct privkey');
-    t.equal(key.pub.toHex(), PASS_PUB, 'must return the correct pubkey');
+    t.equal(key.priv.toString('hex'), PASS_PRIV, 'must return the correct privkey');
+    t.equal(key.pub.toString('hex'), PASS_PUB, 'must return the correct pubkey');
   }, undefined, 'must not throw any Errors');
 
 });

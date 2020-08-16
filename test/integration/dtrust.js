@@ -45,7 +45,7 @@ CT.create(test, client).title('Get New DTrust Address')
   .payload({
     label: DTRUSTLABEL,
     required_signatures: REQUIRED_SIGS,
-    public_keys: KEYS.map(function (key) { return key.pub.toHex(); }).join(',')
+    public_keys: KEYS.map(key => key.pub.toString('hex')).join(',')
   })
   .succeeds()
   .returnsAttrs('address')
@@ -59,7 +59,7 @@ CT.create(test, client).title('Get New DTrust Address')
     args[1].data.additional_signers, SIG_ADDRS,
     'must assign the correct addresses'))
   .check((t, args) => t.ok(
-    Bitcoin.Script.fromASM(args[1].data.redeem_script),
+    Bitcoin.script.fromASM(args[1].data.redeem_script),
     'must create a valid redeem script'))
   .postProcess(args => cache('newDtrustAddress', args[1].data.address))
   .execute();
@@ -69,7 +69,7 @@ CT.create(test, client).title('Get New DTrust Address (too high required sigs)')
   .payload({
     label: DTRUSTLABEL,
     required_signatures: KEYS.length + 1,
-    public_keys: KEYS.map(function (key) { return key.pub.toHex(); }).join(',')
+    public_keys: KEYS.map(key => key.pub.toString('hex')).join(',')
   })
   .fails()
   .execute();
@@ -79,7 +79,7 @@ CT.create(test, client).title('Get New DTrust Address (duplicate signers)')
   .payload({
     label: DTRUSTLABEL,
     required_signatures: KEYS.length,
-    public_keys: KEYS.map(function (key) { return KEYS[0].pub.toHex(); }).join(',')
+    public_keys: KEYS.map(() => KEYS[0].pub.toString('hex')).join(',')
   })
   .fails()
   .execute();
