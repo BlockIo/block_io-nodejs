@@ -23,28 +23,78 @@ For node.js < 5.10.0, please use: `npm install block_io@1.0.9-5`
 
 ## Usage
 
-It's super easy to get started. In your node shell, do:
+It's super easy to get started:
 
 ```javascript
-var BlockIo = require('block_io');
 
-// 'SECRET_PIN' and 'VERSION' are optional
-var block_io = new BlockIo('API_KEY');
+// load this library
+const BlockIo = require('block_io');
 
-// print the account balance
-block_io.get_balance(console.log);
+// instantiate a client
+const block_io = new BlockIo('API_KEY');
 
-// print all addresses on this account
-block_io.get_my_addresses(console.log);
+async function example() {
+  try {
+    // print the account balance
+    let balance = await block_io.get_balance();
+    console.log(balance);
 
-// print the response of a withdrawal request
-block_io.withdraw(
-  {
-    pin: 'SECRET_PIN',
-    from_labels: 'label1,label2',
-    to_label: 'label3',
-    amount: '50.0'
-  }, console.log);
+    // print all addresses on this account
+    let addresses = await block_io.get_my_addresses();
+    console.log(addresses);
+
+    // withdrawal; we specify the PIN here
+    let withdraw = await block_io.withdraw({
+      pin: 'SECRET_PIN',
+      from_labels: 'label1,label2',
+      to_label: 'label3',
+      amount: '50.0'
+    });
+    console.log(withdraw);
+
+  } catch (error) {
+    console.log("Error:", error.message);
+  }
+}
+
+example();
+
+```
+
+### Promises
+
+Since v3.0.0, all methods return promises, like so:
+
+```javascript
+
+block_io.get_balance()
+        .then(data => console.log(JSON.stringify(data)))
+        .catch(error => console.log("Error:", error.message));
+
+```
+
+### Callbacks
+
+For backward compatibility, callback-style method calls are supported too.
+Just add a callback function/lambda as the last argument.
+
+```javascript
+
+block_io.get_balance((err, data) => {
+  if (err) return console.log("Error: error");
+  console.log(JSON.stringify(data));
+}
+
+block_io.withdraw({
+  pin: 'SECRET_PIN',
+  from_labels: 'label1,label2',
+  to_label: 'label3',
+  amount: '50.0'
+}, function (err, data) {
+  if (err) return console.log("Error: error");
+  console.log(JSON.stringify(data));
+});
+
 ```
 
 For more information, see [Node.js API Docs](https://block.io/api/nodejs).

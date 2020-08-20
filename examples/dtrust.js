@@ -5,17 +5,14 @@
  * Any questions? Contact support@block.io.
  */
 
-// This example uses Q (npm install q) for promises
+const BlockIo = require('block_io');
+const crypto = require('crypto');
 
-var Q = require('q');
-var BlockIo = require('block_io');
-var crypto = require('crypto');
+const VERSION = 2;
+const API_KEY = "YOUR API KEY"; // insert your API key here. This script is optimized for TDOGE.
+const PIN = 'YOUR PIN'; // only used to make initial transaction from the default address, not needed for dTrust
 
-var VERSION = 2;
-var API_KEY = "YOUR API KEY"; // insert your dogetest API key here. This script is optimized for TDOGE.
-var PIN = 'YOUR PIN'; // only used to make initial transaction from the default address, not needed for dTrust
-
-var client = new BlockIo({
+const client = new BlockIo({
     api_key: API_KEY,
     version: VERSION
 });
@@ -38,162 +35,115 @@ var pubKeys = [];
 // pubkey entries are expected in hexadecimal format
 console.log('* Collecting public keys...');
 privKeys.forEach(function (key) {
-    var pubkey = key.pub.toHex();
+    var pubkey = key.pub.toString('hex');
     console.log('>> Adding pubkey: ' + pubkey);
     pubKeys.push(pubkey);
 });
 
-Q
-  // create a dTrust address that requires 4 out of 5 keys (4 of ours, 1 at Block.io).
-  // Block.io automatically adds +1 to specified required signatures because of its own key
-  .ninvoke(client, 'get_new_dtrust_address', {
-    label: addressLabel,
-    public_keys: pubKeys.join(','),
-    required_signatures: 3 // required signatures out of the set of signatures that we specified
-  })
+async function dTrust() {
 
-  // print out some information about the address we just created
-  .then(function (response) {
+  try {
 
-    var data = response.data;
+    // create a dTrust address that requires 4 out of 5 keys (4 of ours, 1 at Block.io).
+    // Block.io automatically adds +1 to specified required signatures because of its own key
+    let addrData = await client.get_new_dtrust_address({
+      label: addressLabel,
+      public_keys: pubKeys.join(','),
+      required_signatures: 3 // required signatures out of the set of signatures that we specified
+    });
 
-    console.log('>> New dTrust Address on network ' + data.network + ' is ' + data.address);
+    // print out information about the address we just created
+    const addr = addrData.data.address;
+    const network = addrData.data.network;
+    console.log('>> New dTrust Address on network ' + network + ' is ' + addr);
 
     // save the redeemscript so that you can use the address without depending on block.io services.
-    console.log('>> Redeem script: ' + data.redeem_script);
+    console.log('>> Redeem script:', addrData.data.redeem_script);
 
-    // passthrough the data we just extracted
-    return Q(data);
-  })
-  // let's send some coins to our new address
-  .then(function (data) {
-    console.log('* Sending 50 DOGETEST to ' + data.address);
-
-    var deferred = Q.defer();
-
-    // withdraw 50 test-doge from 'default' address, into our dtrust address
-    Q.ninvoke(client, 'withdraw_from_labels', {
-        from_labels: 'default',
-        to_address: data.address,
-        amount: 50,
-        pin: PIN
-      })
-      .then(function (response) {
-        console.log('>> Transaction ID: ' + response.data.txid);
-
-        // passthrough the original data
-        deferred.resolve(data);
-      })
-      .fail(function (error) {
-        deferred.reject(error);
-      });
-
-      return deferred.promise;
-  })
-  // lets check our balance
-  .then(function (data) {
-    console.log('* Getting address balance for ' + data.address);
-
-    var deferred = Q.defer();
-
-    Q.ninvoke(client, 'get_dtrust_address_balance', {
-        address: data.address
-    })
-    .then(function (response) {
-        data.available_balance = response.data.available_balance;
-        console.log('>> Available Balance in ' + data.address + ' is ' + data.available_balance + ' ' + data.network);
-        deferred.resolve(data);
-    })
-    .fail(function (error) {
-        deferred.reject(error);
+    // let's send some coins to our new address
+    console.log('* Sending 50 DOGETEST to', addr);
+    let funding = await client.withdraw_from_labels({
+      from_labels: 'default',
+      to_address: addr,
+      amount: '50.0',
+      pin: PIN
     });
 
-    return deferred.promise;
-  })
-  // find our non-dtrust default address so we can send coins back to it
-  .then(function (data) {
+    console.log('>> Transaction ID: ' + funding.data.txid);
+
+    // check if some balance got there
+    console.log('* Getting address balance for', addr);
+    let balance = await client.get_dtrust_address_balance({ address: addr });
+
+    const availBalance = balance.data.available_balance;
+    console.log('>> Available Balance in ' + addr + ' is ' + availBalance + ' ' + network);
+
+    // find our non-dtrust default address so we can send coins back to it
     console.log('* Looking up default address');
-    var deferred = Q.defer();
+    let defaultData = await client.get_address_by_label({ label: 'default' });
+    const defaultAddress = defaultData.data.address;
 
-    Q.ninvoke(client, 'get_address_by_label', {
-        label: 'default'
-    })
-    .then(function (response) {
-        data.defaultAddress = response.data.address;
-        console.log('>> Default address: ' + data.defaultAddress);
-        deferred.resolve(data);
-    })
-    .fail(function (error) {
-        deferred.reject(error);
-    });
+    // the amount available minus the network fee needed to transact it
+    var amountToSend = (parseFloat(availBalance) - 1).toFixed(8);
 
-    return deferred.promise;
-  })
-  // let's send the coins back to the default address
-  .then(function (data) {
-    var amountToSend = (parseFloat(data.available_balance) - 1).toFixed(8); // the amount minus the network fee needed to transact it
-
-    console.log('* Sending ' + amountToSend + ' ' + data.network + ' back to ' + data.defaultAddress);
+    console.log('* Sending ' + amountToSend + ' ' + network + ' back to ' + defaultAddress);
     console.log('    Creating withdrawal request...');
 
-    return Q.ninvoke(client, 'withdraw_from_dtrust_address', {
-        from_address: data.address,
-        to_address: data.defaultAddress,
+    // let's send the coins back to the default address
+    let dtrustWithdrawal = await client.withdraw_from_dtrust_address({
+        from_address: addr,
+        to_address: defaultAddress,
         amount: amountToSend
     });
 
-  })
-  // the response contains data to sign and all the public_keys that need to sign it
-  // you can distribute this response to all of your machines the contain your private keys
-  // and have them inform block.io after signing the data
-  // from anywhere, you can then finalize the transaction
-  // below, we take this response, extract the data to sign, sign it and inform Block.io of the signatures
-  .then(function (response) {
-    console.log('>> Withdrawal reference ID: ' + response.data.reference_id);
+    // the response contains data to sign and all the public_keys that need to sign it
+    // you can distribute this response to different processes that stored your
+    // private keys and have them inform block.io after signing the data. You can
+    // then finalize the transaction so that it gets broadcasted to the network.
+    //
+    // Below, we take this response, extract the data to sign, sign it,
+    // and inform Block.io of the signatures, for each signer.
 
-    var keyIndex = 0;
-
-    function sign () {
-
-        // The signInputs helper function signs all relevant inputs for you.
-        // for convenience, we update the 'inputs' object with our signatures every time we sign
-        response.data.inputs = BlockIo.helper.signInputs(privKeys[keyIndex], response.data.inputs);
-        console.log('>> Signed data for public key: ' + privKeys[keyIndex].pub.toHex());
-
-        // move to the next key
-        keyIndex++;
-
-        // send the signature to block.io
-        return Q.ninvoke(client, 'sign_transaction', {
-            signature_data: JSON.stringify(response.data)
-        });
-    }
+    const referenceId = dtrustWithdrawal.data.reference_id;
+    console.log('>> Withdrawal reference ID: ' + referenceId);
 
     // sign for all 4 keys since we have them all here
-    return sign().then(sign).then(sign).then(sign).then(function () {
-        // relay the reference id for finalization
-        return Q(response.data.reference_id);
+    privKeys.forEach(async (key) => {
+
+        // The signInputs helper function signs all relevant inputs for you.
+        // for convenience, we cumulatively update the 'inputs' object with
+        // our signatures, every time we sign, but this is not a requirement.
+        dtrustWithdrawal.data.inputs = BlockIo.helper.signInputs(key, dtrustWithdrawal.data.inputs);
+        console.log('>> Signed data for public key: ' + key.pub.toString('hex'));
+
+        // Send the signatures to block.io
+        try {
+          await client.sign_transaction({
+              signature_data: JSON.stringify(dtrustWithdrawal.data)
+          });
+        } catch (error) {
+          console.log("ERROR: ", error);
+        }
+
     });
 
-  })
-  // finally, tell Block.io to finalize he transaction and broadcast it to the network
-  .then(function (referenceId) {
+    // finalize and broadcast the transaction
     console.log('* Finalizing transaction with reference ID ' + referenceId);
+    let fin = await client.finalize_transaction({ reference_id: referenceId });
 
-    return Q.ninvoke(client, 'finalize_transaction', {
-        reference_id: referenceId
-    });
-  })
-  // print the details of our transaction
-  .then(function (response) {
-    console.log('>> Transaction ID: ' + response.data.txid);
-    console.log('>> Network Fee Incurred: ' + response.data.network_fee, ' ' + response.data.network);
-  })
-  // in case something goes wrong anywhere in the above, print the error and exit
-  .fail(function (error) {
+    // print the details of our transaction
+    console.log('>> Transaction ID: ' + fin.data.txid);
+    console.log('>> Network Fee Incurred: ' + fin.data.network_fee, ' ' + network);
+
+  } catch (error) {
     console.log('ERROR:' + (error instanceof Error) ? error.stack : error);
     process.exit(1);
-  });
+  }
+
+}
+
+// call the async function.
+dTrust();
 
 /* Relevant dTrust API calls (Numbers 1 thru 7: they work the same way as their non-dTrust counterparts on https://block.io/api).
  * For a list of parameters and how to use these calls, please refer to their equivalent counterparts at https://block.io/api
