@@ -1,7 +1,7 @@
-var c = {};
-var l = {};
+const c = {};
+const l = {};
 
-var cache = module.exports = function (k, v) {
+const cache = function (k, v) {
   if (v) {
     c[k] = v;
     if (l[k]) l[k].forEach(fn => fn(v));
@@ -13,10 +13,12 @@ cache.on = function (k, fn) { if (!l[k]) l[k] = []; l[k].push(fn); if (c[k]) fn(
 
 cache.require = function (keys, fn) {
 
-  var _wrapper = function () {
+  const _wrapper = function () {
     if (keys.some(k => !Object.prototype.hasOwnProperty.call(c, k))) return;
     fn(keys.map(k => c[k]));
   }
 
   keys.forEach(k => cache.on(k, _wrapper));
 }
+
+module.exports = cache;

@@ -91,7 +91,7 @@ CT.create(test, client).title('Get Addresses')
   .check((t, args) => t.ok(args[1].data.addresses[0], 'must return at least one address'))
   .postProcess(args => {
     cache('minFee', helper.FEES[args[1].data.network]);
-    var hasBalance = args[1].data.addresses.some(function (addr) {
+    const hasBalance = args[1].data.addresses.some(function (addr) {
       if (parseFloat(addr.available_balance, 10) > (20 * cache('minFee'))) {
         cache('fromAddress', addr.address);
         cache('fromLabel', addr.label);

@@ -3,8 +3,8 @@ const cache = require('../helpers/cache');
 const helper = require('../helpers/generic');
 const CT = require('../helpers/clienttest');
 
-var BlockIo = require('../../lib/block_io');
-var Bitcoin = require('bitcoinjs-lib');
+const BlockIo = require('../../lib/block_io');
+const Bitcoin = require('bitcoinjs-lib');
 
 if (!helper.checkEnv()) process.exit(1);
 
@@ -97,7 +97,7 @@ CT.create(test, client).title('Get DTrust Addresses')
     'must return at least one address'))
   .postProcess(args => {
     cache('minFeeDTrust', helper.FEES[args[1].data.network]);
-    var hasBalance = args[1].data.addresses.some(function (addr) {
+    const hasBalance = args[1].data.addresses.some(function (addr) {
       if (parseFloat(addr.available_balance, 10) > (20 * cache('minFeeDTrust'))) {
         cache('fromDTrustAddress', addr.address);
         cache('fromDTrustLabel', addr.label);

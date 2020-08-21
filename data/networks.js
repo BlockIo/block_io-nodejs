@@ -1,4 +1,4 @@
-var Bitcoin = require('bitcoinjs-lib');
+const Bitcoin = require('bitcoinjs-lib');
 
 Bitcoin.networks.litecoin = {
   messagePrefix: '\x18Dogecoin Signed Message:\n',

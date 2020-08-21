@@ -5,13 +5,13 @@
  *
  * Contact support@block.io if you have any issues
  */
-var BlockIo = require('block_io');
+const BlockIo = require('block_io');
 
 // NOTE: PIN IS NOT NEEDED!!!
-var client = new BlockIo('YOUR_API_KEY');
+const client = new BlockIo('YOUR_API_KEY');
 
-var to_address = 'TARGET_ADDRESS';
-var private_key = 'WIF_TO_SWEEP';
+const to_address = 'TARGET_ADDRESS';
+const private_key = 'WIF_TO_SWEEP';
 
 client.sweep_from_address({
   to_address: to_address,

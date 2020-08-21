@@ -18,24 +18,24 @@ const client = new BlockIo({
 });
 
 // create a new address with a random label
-var addressLabel = 'dtrust' + crypto.randomBytes(4).toString('hex');
+const addressLabel = 'dtrust' + crypto.randomBytes(4).toString('hex');
 
 // create the private key objects for each private key
 // NOTE: in production environments you'll do this elsewhere
-var privKeys = [
+const privKeys = [
   BlockIo.ECKey.fromPassphraseString('verysecretkey1'),
   BlockIo.ECKey.fromPassphraseString('verysecretkey2'),
   BlockIo.ECKey.fromPassphraseString('verysecretkey3'),
   BlockIo.ECKey.fromPassphraseString('verysecretkey4')
 ];
 
-var pubKeys = [];
+const pubKeys = [];
 
 // populate our pubkeys array from the keys we just generated
 // pubkey entries are expected in hexadecimal format
 console.log('* Collecting public keys...');
 privKeys.forEach(function (key) {
-    var pubkey = key.pub.toString('hex');
+    const pubkey = key.pub.toString('hex');
     console.log('>> Adding pubkey: ' + pubkey);
     pubKeys.push(pubkey);
 });
@@ -84,7 +84,7 @@ async function dTrust() {
     const defaultAddress = defaultData.data.address;
 
     // the amount available minus the network fee needed to transact it
-    var amountToSend = (parseFloat(availBalance) - 1).toFixed(8);
+    const amountToSend = (parseFloat(availBalance) - 1).toFixed(8);
 
     console.log('* Sending ' + amountToSend + ' ' + network + ' back to ' + defaultAddress);
     console.log('    Creating withdrawal request...');
