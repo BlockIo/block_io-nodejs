@@ -80,8 +80,8 @@ Just add a callback function/lambda as the last argument.
 
 ```javascript
 
-block_io.get_balance((err, data) => {
-  if (err) return console.log("Error: error");
+block_io.get_balance((error, data) => {
+  if (error) return console.log("Error:", error.message);
   console.log(JSON.stringify(data));
 }
 
@@ -90,8 +90,8 @@ block_io.withdraw({
   from_labels: 'label1,label2',
   to_label: 'label3',
   amount: '50.0'
-}, function (err, data) {
-  if (err) return console.log("Error: error");
+}, function (error, data) {
+  if (error) return console.log("Error:", error.message);
   console.log(JSON.stringify(data));
 });
 
