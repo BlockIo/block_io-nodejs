@@ -1,42 +1,39 @@
 {
-  "name" : "block_io",
-  "description" : "Block.io API wrapper for node.js",
-  "keywords" : [ "block.io", "block_io", "bitcoin", "litecoin", "dogecoin", "wallet" ],
-  "version" : "2.0.2",
-  "preferGlobal" : false,
-  "homepage" : "https://github.com/BlockIo/block_io-nodejs",
-  "author" : "Patrick Lodder <patrick.lodder@gmail.com> (https://github.com/patricklodder)",
-  "repository" : {
-    "type" : "git",
-    "url" : "git://github.com/BlockIo/block_io-nodejs.git"
+  "name": "block_io",
+  "description": "Block.io API wrapper for node.js",
+  "keywords": [
+    "block.io",
+    "block_io",
+    "bitcoin",
+    "litecoin",
+    "dogecoin",
+    "wallet"
+  ],
+  "version": "3.0.0",
+  "preferGlobal": false,
+  "homepage": "https://github.com/BlockIo/block_io-nodejs",
+  "author": "Patrick Lodder <patrick.lodder@gmail.com> (https://github.com/patricklodder)",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/BlockIo/block_io-nodejs.git"
   },
-  "bugs" : {
-    "url" : "https://github.com/BlockIo/block_io-nodejs/issues"
+  "bugs": {
+    "url": "https://github.com/BlockIo/block_io-nodejs/issues"
   },
-  "directories" : {
-    "lib" : "./lib"
+  "directories": {
+    "lib": "./lib"
   },
-  "main" : "./lib/block_io.js",
-  "dependencies" : {
-    "request"       : "=2.88.0",
-    "bigi"          : "=1.4.2",
-    "bitcoinjs-lib" : "=1.5.6",
-    "pbkdf2"        : "=3.0.16"
+  "main": "./lib/block_io.js",
+  "dependencies": {
+    "bitcoinjs-lib": "^5.1.10",
+    "pbkdf2": "^3.1.1"
   },
   "devDependencies": {
-    "vows": "0.8.x"
-  },
-  "engines" : {
-    "node" : ">=5.10.1",
-    "npm" : ">=3.8.3"
+    "eslint": "^7.7.0",
+    "tape": "^5.0.1"
   },
   "scripts": {
-    "test" : "node_modules/.bin/vows --spec test/*.js"
+    "test": "node test/unit/cryptohelper.js && node test/unit/key.js && npx eslint ."
   },
-  "licenses" : [ {
-      "type" : "MIT"
-    , "url" : "https://github.com/BlockIo/block_io-nodejs/raw/master/LICENSE"
-    }
-  ]
+  "license": "MIT"
 }
-

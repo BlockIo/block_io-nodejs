@@ -1,54 +1,49 @@
-// creates a new destination address, withdraws from the default label to it, gets sent transactions, and the current price
-var BlockIo = require('block_io');
+// creates a new destination address, withdraws from the default label to it,
+// gets sent transactions, and the current price, using async/await
 
-var PIN = 'YOURSECRETPIN';
+const BlockIo = require('block_io');
 
-// please use the Dogecoin Testnet API key here
-var client = new BlockIo({
-  api_key: 'YOURDOGECOINTESTNETAPIKEY',
-  version: 2
-});
+const PIN = 'YOUR_PIN';
+const AMOUNT = '50.0';
 
-client.get_new_address({label: 'testDest'}, function (error, data) {
-  if (error) return console.log("Error occured:", error.message);
+// please use a Testnet API key here
+const client = new BlockIo('YOUR_TESTNET_KEY');
+
+async function example() {
+  try {
+    let data;
+
+    // create a new address
+    data = await client.get_new_address({ label: 'asyncTest' });
     console.log(JSON.stringify(data, null, 2));
-});
 
-// withdraw 3.5 TDOGE to our new address
-// This is the only call where PIN is needed
-client.withdraw_from_labels({
-  from_labels: 'default',
-  to_label: 'testDest',
-  amount: '3.5',
-  pin: PIN
-}, function (error, data) {
-  if (error) return console.log("Error occured:", error.message);
+    // Withdraw to our new address
+    // This is the only call where PIN is needed
+    data = await client.withdraw_from_labels({
+      from_labels: 'default',
+      to_label: 'asyncTest',
+      amount: AMOUNT,
+      pin: PIN
+    });
     console.log(JSON.stringify(data, null, 2));
-});
 
-// Show the address associated with the label 'default'
-client.get_address_by_label({
-  label: 'default'
-}, function (error, data) {
-  if (error) return console.log("Error occured:", error.message);
+    // Show the address associated with the label 'default'
+    data = await client.get_address_by_label({ label: 'default' });
     console.log(JSON.stringify(data, null, 2));
-});
 
-// Show transactions we sent
-// API v2 only
-client.get_transactions({
-  type: 'sent'
-}, function (error, data) {
-  if (error) return console.log("Error occured:", error.message);
+    // Show transactions we sent
+    data = await client.get_transactions({ type: 'sent' });
     console.log(JSON.stringify(data, null, 2));
-});
 
-// Show the current price with BTC
-client.get_current_price({
-  base_price: 'BTC'
-}, function (error, data) {
-  if (error) return console.log("Error occured:", error.message);
+    // Show the current price with BTC
+    data = await client.get_current_price({ base_price: 'BTC' });
     console.log(JSON.stringify(data, null, 2));
-});
 
+  } catch (error) {
+    //stop on any errors and log it
+    console.log("Error occured:", error.message);
+  }
+}
 
+// run the example
+example();
