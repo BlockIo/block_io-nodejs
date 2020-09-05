@@ -35,5 +35,8 @@
   "scripts": {
     "test": "node test/unit/cryptohelper.js && node test/unit/key.js && npx eslint ."
   },
-  "license": "MIT"
+  "license": "MIT",
+  "engines": {
+    "node": "^14 || ^13 || ^12 || ^10"
+  }
 }
