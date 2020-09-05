@@ -29,6 +29,14 @@ const pinLessClient = new BlockIo({
   options: { allowNoPin: true }
 });
 
+const lowRClient = new BlockIo({
+  api_key: API_KEY,
+  version: VERSION,
+  server: SERVER,
+  port: PORT,
+  options: { lowR: true }
+});
+
 const badApiKeyClient = new BlockIo({
   api_key: "1111-1111-1111-1111",
   version: VERSION,
@@ -121,6 +129,18 @@ if (["BTCTEST", "LTCTEST"].indexOf(cache('network')) !== -1) {
 cache.require(['minFee', 'newAddress', 'fromAddress', 'fromLabel'], () => {
 
   CT.create(test, client).title('Withdraw From Address')
+    .method('withdraw_from_address')
+    .payload({
+      from_addresses: cache('fromAddress'),
+      to_label: NEWLABEL,
+      amount: helper.calcWithdrawalAmount(),
+      pin: PIN
+    })
+    .succeeds()
+    .returnsTx()
+    .execute();
+
+  CT.create(test, lowRClient).title('Withdraw From Address (low R)')
     .method('withdraw_from_address')
     .payload({
       from_addresses: cache('fromAddress'),
