@@ -119,10 +119,10 @@ const config = {
                            // intrinsically. This is useful when interfacing
                            // with hardware wallets and HSMs. Default: false.
 
-    lowR: false,           // Sign with a low R value to save a byte and
+    lowR: true,            // Sign with a low R value to save a byte and
                            // make signature size more predictable, at the
                            // cost of more CPU time needed to sign transactions.
-                           // Default: false
+                           // Default: true
 
   }
 }

@@ -18,6 +18,8 @@ test('ECKey extensions: deriving a pubkey from hex', t => {
   let key;
   t.doesNotThrow(() => {
     key = Key.fromHex(PRIVKEY);
+    key.lowR = false;
+
     t.equal(key.pub.toString('hex'), PUBKEY, 'must return the correct pubkey');
   }, undefined, 'must not throw any Errors');
 
