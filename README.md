@@ -80,8 +80,8 @@ Just add a callback function/lambda as the last argument.
 
 ```javascript
 
-block_io.get_balance((err, data) => {
-  if (err) return console.log("Error: error");
+block_io.get_balance((error, data) => {
+  if (error) return console.log("Error:", error.message);
   console.log(JSON.stringify(data));
 }
 
@@ -90,8 +90,8 @@ block_io.withdraw({
   from_labels: 'label1,label2',
   to_label: 'label3',
   amount: '50.0'
-}, function (err, data) {
-  if (err) return console.log("Error: error");
+}, function (error, data) {
+  if (error) return console.log("Error:", error.message);
   console.log(JSON.stringify(data));
 });
 
@@ -100,6 +100,35 @@ block_io.withdraw({
 For more information, see [Node.js API Docs](https://block.io/api/nodejs).
 This client provides a mapping for all methods listed on the Block.io API
 site.
+
+### Configuration
+
+To change behavior of the `block_io` client, attributes can be passed to the
+class at instantiation time, in the form of an object.
+
+The following attributes are supported:
+
+```javascript
+const config = {
+  api_key: "YOUR_API_KEY",
+  version: 2,              // REST API version to use. Default: 2
+  options: {
+    allowNoPin: false,     // Allow ommission of PIN for withdrawal. This makes
+                           // withdrawal functions return inputs to sign
+                           // outside of the client, rather than sign them
+                           // intrinsically. This is useful when interfacing
+                           // with hardware wallets and HSMs. Default: false.
+
+    lowR: true,            // Sign with a low R value to save a byte and
+                           // make signature size more predictable, at the
+                           // cost of more CPU time needed to sign transactions.
+                           // Default: true
+
+  }
+}
+
+const block_io = new BlockIo(config);
+```
 
 ## Contributing
 

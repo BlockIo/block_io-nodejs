@@ -26,6 +26,9 @@ const KEYS = [
   BlockIo.ECKey.fromPassphrase(Buffer.from('key3'))
 ];
 
+// Key 0 signs with lowR
+KEYS[0].lowR = true;
+
 const SIG_ADDRS = [
   'nZ7QHcpJ5tpzxQUV8vEnGU4m7zLjkNiMBU',
   'nj8visBXviBNZs5zXkn6DYG6Nc97Nv995g',
@@ -224,7 +227,7 @@ cache.require(['dtrustWithdrawal'], () => {
   const w = cache('dtrustWithdrawal');
   w.data.inputs = BlockIo.helper.signInputs(KEYS[0], w.data.inputs);
 
-  CT.create(test, client).title('Sending in single-key withdrawal sigs')
+  CT.create(test, client).title('Sending in single-key withdrawal sigs with low R')
   .method('sign_and_finalize_withdrawal')
   .payload({ signature_data: JSON.stringify(w.data) })
   .succeeds()
