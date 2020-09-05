@@ -101,6 +101,35 @@ For more information, see [Node.js API Docs](https://block.io/api/nodejs).
 This client provides a mapping for all methods listed on the Block.io API
 site.
 
+### Configuration
+
+To change behavior of the `block_io` client, attributes can be passed to the
+class at instantiation time, in the form of an object.
+
+The following attributes are supported:
+
+```javascript
+const config = {
+  api_key: "YOUR_API_KEY",
+  version: 2,              // REST API version to use. Default: 2
+  options: {
+    allowNoPin: false,     // Allow ommission of PIN for withdrawal. This makes
+                           // withdrawal functions return inputs to sign
+                           // outside of the client, rather than sign them
+                           // intrinsically. This is useful when interfacing
+                           // with hardware wallets and HSMs. Default: false.
+
+    lowR: false,           // Sign with a low R value to save a byte and
+                           // make signature size more predictable, at the
+                           // cost of more CPU time needed to sign transactions.
+                           // Default: false
+
+  }
+}
+
+const block_io = new BlockIo(config);
+```
+
 ## Contributing
 
 1. Fork it ( https://github.com/BlockIo/block_io-nodejs/fork )
