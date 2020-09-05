@@ -9,7 +9,7 @@
     "dogecoin",
     "wallet"
   ],
-  "version": "3.0.1",
+  "version": "3.0.2",
   "preferGlobal": false,
   "homepage": "https://github.com/BlockIo/block_io-nodejs",
   "author": "Patrick Lodder <patrick.lodder@gmail.com> (https://github.com/patricklodder)",
