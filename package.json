@@ -25,11 +25,11 @@
   },
   "main": "./lib/block_io.js",
   "dependencies": {
-    "bitcoinjs-lib": "^5.1.10",
+    "bitcoinjs-lib": "^5.2.0",
     "pbkdf2": "^3.1.1"
   },
   "devDependencies": {
-    "eslint": "^7.8.1",
+    "eslint": "^7.9.0",
     "tape": "^5.0.1"
   },
   "scripts": {
