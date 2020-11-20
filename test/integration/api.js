@@ -205,7 +205,7 @@ cache.require(['minFee', 'newAddress', 'fromAddress', 'fromLabel'], () => {
 
     CT.create(test, badApiKeyClient).title('Validate API key (invalid key)')
       .method('validate_api_key')
-      .fails()
+      .failsServerSide()
       .execute();
 
     CT.create(test, client).title('Get network fee estimate')

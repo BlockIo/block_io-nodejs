@@ -26,6 +26,10 @@ const ERR_CHECKS = [
   }
 ];
 
+const ERR_DATA_CHECK = (t, args) => {
+  t.ok(typeof args[0].data == 'object', 'must return response data');
+}
+
 function ClientTest(framework, client) {
   this.framework = framework;
   this.client = client;
@@ -58,6 +62,11 @@ ClientTest.prototype.succeeds = function () {
 ClientTest.prototype.fails = function () {
   ERR_CHECKS.forEach(fn => this._tests.push(fn));
   return this;
+}
+
+ClientTest.prototype.failsServerSide = function () {
+  this._tests.push(ERR_DATA_CHECK);
+  return this.fails();
 }
 
 ClientTest.prototype.returnsTx = function () {

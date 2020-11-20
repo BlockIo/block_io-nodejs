@@ -73,7 +73,7 @@ CT.create(test, client).title('Get New DTrust Address (too high required sigs)')
     required_signatures: KEYS.length + 1,
     public_keys: KEYS.map(key => key.pub.toString('hex')).join(',')
   })
-  .fails()
+  .failsServerSide()
   .execute();
 
 CT.create(test, client).title('Get New DTrust Address (duplicate signers)')
@@ -83,7 +83,7 @@ CT.create(test, client).title('Get New DTrust Address (duplicate signers)')
     required_signatures: KEYS.length,
     public_keys: KEYS.map(() => KEYS[0].pub.toString('hex')).join(',')
   })
-  .fails()
+  .failsServerSide()
   .execute();
 
 CT.create(test, client).title('Get DTrust Addresses')
@@ -255,7 +255,7 @@ cache.require(['dtrustWithdrawal'], () => {
   CT.create(test, client).title('Sending in an already finished withdrawal')
   .method('sign_and_finalize_withdrawal')
   .payload({ signature_data: JSON.stringify(w.data) })
-  .fails()
+  .failsServerSide()
   .execute();
 
 });
