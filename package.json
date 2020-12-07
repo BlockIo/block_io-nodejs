@@ -29,8 +29,8 @@
     "pbkdf2": "^3.1.1"
   },
   "devDependencies": {
-    "eslint": "^7.13.0",
-    "tape": "^5.0.1"
+    "eslint": "^7.18.0",
+    "tape": "^5.1.1"
   },
   "scripts": {
     "test": "node test/unit/cryptohelper.js && node test/unit/key.js && npx eslint ."
