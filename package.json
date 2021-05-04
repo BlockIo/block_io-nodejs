@@ -33,7 +33,7 @@
     "tape": "^5.2.1"
   },
   "scripts": {
-    "test": "node test/unit/cryptohelper.js && node test/unit/key.js && npx eslint ."
+    "test": "node test/unit/cryptohelper.js && node test/unit/key.js && node test/unit/bitcoinjs-lib.js && npx eslint ."
   },
   "license": "MIT",
   "engines": {
