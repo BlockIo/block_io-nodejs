@@ -35,3 +35,12 @@ test('Encrypting some data', t => {
   });
 
 });
+
+test('Satoshis from number string', t => {
+  t.plan(3);
+
+  t.equal(CryptoHelper.to_satoshis("1"), 100000000);
+  t.equal(CryptoHelper.to_satoshis("1.12345678"), 112345678);
+  t.equal(CryptoHelper.to_satoshis("0.00000001"), 1);
+
+});
