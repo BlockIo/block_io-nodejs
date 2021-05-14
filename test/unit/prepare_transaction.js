@@ -1,10 +1,5 @@
 /*eslint no-mixed-spaces-and-tabs: ["error", "smart-tabs"]*/
-
-/* 
-   Commented tests are failing because of odd implementation of low R signatures in bitcoinjs-5.2.0
-   Instead of checking for R length == 0x20 after DER encoding, it checks for R[0] < 0x80 only, and before DER encoding
-   The signatures generated are still valid, but different from our fixtures
-*/
+// all tests here use 32-byte low R values
 
 const test = require('tape');
 const fs = require('fs');
@@ -51,7 +46,6 @@ test('prepare_transaction_response.json', t => {
 
 });
 
-/*
 test('prepare_transaction_response_P2WSH-over-P2SH_1of2_251inputs.json', t => {
     
     const prepare_transaction_response = read_json_file("../../data/test-cases/json/prepare_transaction_response_P2WSH-over-P2SH_1of2_251inputs.json");
@@ -60,15 +54,12 @@ test('prepare_transaction_response_P2WSH-over-P2SH_1of2_251inputs.json', t => {
     t.plan(1);
 
     client.create_and_sign_transaction({data: prepare_transaction_response, keys: []}).then((f) => {
-	console.log("expected=" + JSON.stringify(create_and_sign_transaction_response));
-	console.log("actual=" + JSON.stringify(f));
 	t.deepEqual(f,create_and_sign_transaction_response);	
     }).catch((r) => {
 	t.equal(typeof(r),'undefined', "should not throw exception");
     });
 
 });
-*/
 
 test('prepare_transaction_response_P2WSH-over-P2SH_1of2_252inputs.json', t => {
     
@@ -85,7 +76,6 @@ test('prepare_transaction_response_P2WSH-over-P2SH_1of2_252inputs.json', t => {
 
 });
 
-/*
 test('prepare_transaction_response_P2WSH-over-P2SH_1of2_253inputs.json', t => {
     
     const prepare_transaction_response = read_json_file("../../data/test-cases/json/prepare_transaction_response_P2WSH-over-P2SH_1of2_253inputs.json");
@@ -115,7 +105,6 @@ test('prepare_transaction_response_P2WSH-over-P2SH_1of2_762inputs.json', t => {
     });
 
 });
-*/
 
 test('prepare_dtrust_transaction_response_p2sh.json (3of5)', t => {
     
@@ -127,7 +116,6 @@ test('prepare_dtrust_transaction_response_p2sh.json (3of5)', t => {
     client.create_and_sign_transaction({data: prepare_transaction_response, keys: DTRUST_KEYS.slice(0,3)}).then((f) => {
 	t.deepEqual(f,create_and_sign_transaction_response);
     }).catch((r) => {
-	console.log(r);
 	t.equal(typeof(r),'undefined', "should not throw exception");
     });
 
@@ -143,7 +131,6 @@ test('prepare_dtrust_transaction_response_p2sh.json (4of5)', t => {
     client.create_and_sign_transaction({data: prepare_transaction_response, keys: DTRUST_KEYS.slice(0,4)}).then((f) => {
 	t.deepEqual(f,create_and_sign_transaction_response);
     }).catch((r) => {
-	console.log(r);
 	t.equal(typeof(r),'undefined', "should not throw exception");
     });
 
@@ -159,7 +146,6 @@ test('prepare_dtrust_transaction_response_p2wsh_over_p2sh.json (3of5)', t => {
     client.create_and_sign_transaction({data: prepare_transaction_response, keys: DTRUST_KEYS.slice(0,3)}).then((f) => {
 	t.deepEqual(f,create_and_sign_transaction_response);
     }).catch((r) => {
-	console.log(r);
 	t.equal(typeof(r),'undefined', "should not throw exception");
     });
 
@@ -175,7 +161,6 @@ test('prepare_dtrust_transaction_response_p2wsh_over_p2sh.json (4of5)', t => {
     client.create_and_sign_transaction({data: prepare_transaction_response, keys: DTRUST_KEYS.slice(0,4)}).then((f) => {
 	t.deepEqual(f,create_and_sign_transaction_response);
     }).catch((r) => {
-	console.log(r);
 	t.equal(typeof(r),'undefined', "should not throw exception");
     });
 
@@ -252,6 +237,207 @@ test('prepare_sweep_transaction_response_p2wpkh.json', t => {
 	t.deepEqual(f,create_and_sign_transaction_response);
     }).catch((r) => {
 	t.equal(typeof(r),'undefined', "should not throw exception");
+    });
+
+});
+
+test('prepare_dtrust_transaction_response_P2SH_3of5_195inputs.json', t => {
+    
+    const prepare_transaction_response = read_json_file("../../data/test-cases/json/prepare_dtrust_transaction_response_P2SH_3of5_195inputs.json");
+    const create_and_sign_transaction_response = read_json_file("../../data/test-cases/json/create_and_sign_transaction_response_dtrust_P2SH_3of5_195inputs.json");
+
+    t.plan(1);
+
+    client.create_and_sign_transaction({data: prepare_transaction_response, keys: DTRUST_KEYS.slice(0,3)}).then((f) => {
+	t.deepEqual(f,create_and_sign_transaction_response);	
+    }).catch((r) => {
+	t.equal(typeof(r),'undefined', "should not throw exception");
+    });
+
+});
+
+/* 
+   omit 4of5 tests due to difference in low R signature generation (see fixed_low_r_sign in lib/key.js)
+*/
+/*
+test('prepare_dtrust_transaction_response_P2SH_4of5_195inputs.json', t => {
+    
+    const prepare_transaction_response = read_json_file("../../data/test-cases/json/prepare_dtrust_transaction_response_P2SH_4of5_195inputs.json");
+    const create_and_sign_transaction_response = read_json_file("../../data/test-cases/json/create_and_sign_transaction_response_dtrust_P2SH_4of5_195inputs.json");
+
+    t.plan(1);
+
+    client.create_and_sign_transaction({data: prepare_transaction_response, keys: DTRUST_KEYS.slice(0,4)}).then((f) => {
+	t.deepEqual(f,create_and_sign_transaction_response);	
+    }).catch((r) => {
+	t.equal(typeof(r),'undefined', "should not throw exception");
+    });
+
+});
+*/
+
+test('prepare_dtrust_transaction_response_P2WSH-over-P2SH_3of5_251inputs.json', t => {
+    
+    const prepare_transaction_response = read_json_file("../../data/test-cases/json/prepare_dtrust_transaction_response_P2WSH-over-P2SH_3of5_251inputs.json");
+    const create_and_sign_transaction_response = read_json_file("../../data/test-cases/json/create_and_sign_transaction_response_dtrust_P2WSH-over-P2SH_3of5_251inputs.json");
+
+    t.plan(1);
+
+    client.create_and_sign_transaction({data: prepare_transaction_response, keys: DTRUST_KEYS.slice(0,3)}).then((f) => {
+	t.deepEqual(f,create_and_sign_transaction_response);	
+    }).catch((r) => {
+	t.equal(typeof(r),'undefined', "should not throw exception");
+    });
+
+});
+
+test('prepare_dtrust_transaction_response_P2WSH-over-P2SH_3of5_252inputs.json', t => {
+    
+    const prepare_transaction_response = read_json_file("../../data/test-cases/json/prepare_dtrust_transaction_response_P2WSH-over-P2SH_3of5_252inputs.json");
+    const create_and_sign_transaction_response = read_json_file("../../data/test-cases/json/create_and_sign_transaction_response_dtrust_P2WSH-over-P2SH_3of5_252inputs.json");
+
+    t.plan(1);
+
+    client.create_and_sign_transaction({data: prepare_transaction_response, keys: DTRUST_KEYS.slice(0,3)}).then((f) => {
+	t.deepEqual(f,create_and_sign_transaction_response);	
+    }).catch((r) => {
+	t.equal(typeof(r),'undefined', "should not throw exception");
+    });
+
+});
+
+test('prepare_dtrust_transaction_response_P2WSH-over-P2SH_3of5_253inputs.json', t => {
+    
+    const prepare_transaction_response = read_json_file("../../data/test-cases/json/prepare_dtrust_transaction_response_P2WSH-over-P2SH_3of5_253inputs.json");
+    const create_and_sign_transaction_response = read_json_file("../../data/test-cases/json/create_and_sign_transaction_response_dtrust_P2WSH-over-P2SH_3of5_253inputs.json");
+
+    t.plan(1);
+
+    client.create_and_sign_transaction({data: prepare_transaction_response, keys: DTRUST_KEYS.slice(0,3)}).then((f) => {
+	t.deepEqual(f,create_and_sign_transaction_response);	
+    }).catch((r) => {
+	t.equal(typeof(r),'undefined', "should not throw exception");
+    });
+
+});
+
+test('prepare_dtrust_transaction_response_WITNESS_V0_3of5_251inputs.json', t => {
+    
+    const prepare_transaction_response = read_json_file("../../data/test-cases/json/prepare_dtrust_transaction_response_WITNESS_V0_3of5_251inputs.json");
+    const create_and_sign_transaction_response = read_json_file("../../data/test-cases/json/create_and_sign_transaction_response_dtrust_WITNESS_V0_3of5_251inputs.json");
+
+    t.plan(1);
+
+    client.create_and_sign_transaction({data: prepare_transaction_response, keys: DTRUST_KEYS.slice(0,3)}).then((f) => {
+	t.deepEqual(f,create_and_sign_transaction_response);	
+    }).catch((r) => {
+	t.equal(typeof(r),'undefined', "should not throw exception");
+    });
+
+});
+
+test('prepare_dtrust_transaction_response_WITNESS_V0_3of5_252inputs.json', t => {
+    
+    const prepare_transaction_response = read_json_file("../../data/test-cases/json/prepare_dtrust_transaction_response_WITNESS_V0_3of5_252inputs.json");
+    const create_and_sign_transaction_response = read_json_file("../../data/test-cases/json/create_and_sign_transaction_response_dtrust_WITNESS_V0_3of5_252inputs.json");
+
+    t.plan(1);
+
+    client.create_and_sign_transaction({data: prepare_transaction_response, keys: DTRUST_KEYS.slice(0,3)}).then((f) => {
+	t.deepEqual(f,create_and_sign_transaction_response);	
+    }).catch((r) => {
+	t.equal(typeof(r),'undefined', "should not throw exception");
+    });
+
+});
+
+test('prepare_dtrust_transaction_response_WITNESS_V0_3of5_253inputs.json', t => {
+    
+    const prepare_transaction_response = read_json_file("../../data/test-cases/json/prepare_dtrust_transaction_response_WITNESS_V0_3of5_253inputs.json");
+    const create_and_sign_transaction_response = read_json_file("../../data/test-cases/json/create_and_sign_transaction_response_dtrust_WITNESS_V0_3of5_253inputs.json");
+
+    t.plan(1);
+
+    client.create_and_sign_transaction({data: prepare_transaction_response, keys: DTRUST_KEYS.slice(0,3)}).then((f) => {
+	t.deepEqual(f,create_and_sign_transaction_response);	
+    }).catch((r) => {
+	t.equal(typeof(r),'undefined', "should not throw exception");
+    });
+
+});
+
+test('prepare_dtrust_transaction_response_witness_v0_3of5_251outputs.json', t => {
+    
+    const prepare_transaction_response = read_json_file("../../data/test-cases/json/prepare_dtrust_transaction_response_witness_v0_3of5_251outputs.json");
+    const create_and_sign_transaction_response = read_json_file("../../data/test-cases/json/create_and_sign_transaction_response_dtrust_witness_v0_3of5_251outputs.json");
+
+    t.plan(1);
+
+    client.create_and_sign_transaction({data: prepare_transaction_response, keys: DTRUST_KEYS.slice(0,3)}).then((f) => {
+	t.deepEqual(f,create_and_sign_transaction_response);	
+    }).catch((r) => {
+	t.equal(typeof(r),'undefined', "should not throw exception");
+    });
+
+});
+
+test('prepare_dtrust_transaction_response_witness_v0_3of5_252outputs.json', t => {
+    
+    const prepare_transaction_response = read_json_file("../../data/test-cases/json/prepare_dtrust_transaction_response_witness_v0_3of5_252outputs.json");
+    const create_and_sign_transaction_response = read_json_file("../../data/test-cases/json/create_and_sign_transaction_response_dtrust_witness_v0_3of5_252outputs.json");
+
+    t.plan(1);
+
+    client.create_and_sign_transaction({data: prepare_transaction_response, keys: DTRUST_KEYS.slice(0,3)}).then((f) => {
+	t.deepEqual(f,create_and_sign_transaction_response);	
+    }).catch((r) => {
+	t.equal(typeof(r),'undefined', "should not throw exception");
+    });
+
+});
+
+test('prepare_dtrust_transaction_response_witness_v0_3of5_253outputs.json', t => {
+    
+    const prepare_transaction_response = read_json_file("../../data/test-cases/json/prepare_dtrust_transaction_response_witness_v0_3of5_253outputs.json");
+    const create_and_sign_transaction_response = read_json_file("../../data/test-cases/json/create_and_sign_transaction_response_dtrust_witness_v0_3of5_253outputs.json");
+
+    t.plan(1);
+
+    client.create_and_sign_transaction({data: prepare_transaction_response, keys: DTRUST_KEYS.slice(0,3)}).then((f) => {
+	t.deepEqual(f,create_and_sign_transaction_response);	
+    }).catch((r) => {
+	t.equal(typeof(r),'undefined', "should not throw exception");
+    });
+
+});
+
+test('prepare_transaction_response_with_blockio_fee_and_expected_unsigned_txid.json', t => {
+    
+    const prepare_transaction_response = read_json_file("../../data/test-cases/json/prepare_transaction_response_with_blockio_fee_and_expected_unsigned_txid.json");
+    const summarize_prepared_transaction_response = read_json_file("../../data/test-cases/json/summarize_prepared_transaction_response_with_blockio_fee_and_expected_unsigned_txid.json");
+    const create_and_sign_transaction_response = read_json_file("../../data/test-cases/json/create_and_sign_transaction_response_with_blockio_fee_and_expected_unsigned_txid.json");
+
+    t.plan(3);
+
+    client.summarize_prepared_transaction({data: prepare_transaction_response}).then((f) => {
+	t.deepEqual(f,summarize_prepared_transaction_response);
+    }).catch((r) => {
+	console.log(r);
+	t.equal(typeof(r),'undefined', "should not throw exception");
+    });
+     
+    client.create_and_sign_transaction({data: prepare_transaction_response, keys: []}).then((f) => {
+	t.deepEqual(f,create_and_sign_transaction_response);	
+    }).catch((r) => {
+	t.equal(typeof(r),'undefined', "should not throw exception");
+    });
+
+    // change the expected unsigned txid
+    prepare_transaction_response.data.expected_unsigned_txid = 'x';
+    client.create_and_sign_transaction({data: prepare_transaction_response, keys: []}).then((f) => {
+	t.equal(typeof(f),'undefined', "should have no response");
+    }).catch((r) => {
+	t.notEqual(typeof(r),'undefined', "should throw exception");
     });
 
 });

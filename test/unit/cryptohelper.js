@@ -36,11 +36,20 @@ test('Encrypting some data', t => {
 
 });
 
-test('Satoshis from number string', t => {
+test('Satoshis from value string', t => {
   t.plan(4);
 
   t.equal(CryptoHelper.to_satoshis("1.00000000"), 100000000);
   t.equal(CryptoHelper.to_satoshis("1.12345678"), 112345678);
   t.equal(CryptoHelper.to_satoshis("0.00000001"), 1);
   t.equal(CryptoHelper.to_satoshis("0.00112500"), 112500);
+});
+
+test('Value string from Satoshis', t => {
+  t.plan(4);
+
+  t.equal(CryptoHelper.from_satoshis(100000000), "1.00000000");
+  t.equal(CryptoHelper.from_satoshis(112345678), "1.12345678");
+  t.equal(CryptoHelper.from_satoshis(1), "0.00000001");
+  t.equal(CryptoHelper.from_satoshis(112500), "0.00112500");
 });
