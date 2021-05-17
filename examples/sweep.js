@@ -22,8 +22,8 @@ async function example() {
 	// get data to create the transaction
 	// the private key is converted to hex form and used by create_and_sign_transaction. It does not go to Block.io.
 	let prepared_transaction = await client.prepare_sweep_transaction({
-	    to_address: to_address,
-	    private_key: private_key
+            to_address: to_address,
+            private_key: private_key
 	});
 	console.log(JSON.stringify(prepared_transaction,null,2));
 	
