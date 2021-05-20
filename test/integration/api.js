@@ -29,14 +29,6 @@ const pinLessClient = new BlockIo({
   options: { allowNoPin: true }
 });
 
-const lowRClient = new BlockIo({
-  api_key: API_KEY,
-  version: VERSION,
-  server: SERVER,
-  port: PORT,
-  options: { lowR: true }
-});
-
 const badApiKeyClient = new BlockIo({
   api_key: "1111-1111-1111-1111",
   version: VERSION,
@@ -152,15 +144,15 @@ cache.require(['minFee', 'newAddress', 'fromAddress', 'fromLabel'], () => {
     .execute();
 
   cache.require(['preparedTransactionFromAddress'], () => {
-      client.create_and_sign_transaction({data: cache('preparedTransactionFromAddress'), pin: PIN}).then((f,r) => {
+      client.create_and_sign_transaction({data: cache('preparedTransactionFromAddress'), pin: PIN}).then((f) => {
 	CT.create(test, client).title('Submit Transaction')
-	  .method('submit_transaction')
-	  .payload({
-             transaction_data: f
-	  })
-	  .succeeds()
-	  .returnsAttrs(['network', 'txid'])
-	  .execute();
+          .method('submit_transaction')
+          .payload({
+            transaction_data: f
+          })
+          .succeeds()
+          .returnsAttrs(['network', 'txid'])
+          .execute();
       });
   });
     

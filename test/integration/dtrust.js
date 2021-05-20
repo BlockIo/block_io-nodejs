@@ -11,7 +11,7 @@ if (!helper.checkEnv()) process.exit(1);
 if (process.env.DEBUG) process.on('uncaughtException', function (e) { console.log(e.stack); });
 
 const API_KEY = process.env.BLOCK_IO_API_KEY;
-const PIN = process.env.BLOCK_IO_PIN;
+//const PIN = process.env.BLOCK_IO_PIN;
 const VERSION = process.env.BLOCK_IO_VERSION || BlockIo.DEFAULT_VERSION;
 const SERVER = process.env.BLOCK_IO_SERVER || '';
 const PORT = process.env.BLOCK_IO_PORT || '';
@@ -223,7 +223,7 @@ cache.require([
 });
 
 cache.require(['dtrustWithdrawal'], () => {
-    client.create_and_sign_transaction({data: cache('dtrustWithdrawal'), keys: [KEYS[0].priv.toString('hex'), KEYS[1].priv.toString('hex')]}).then((f,r) => {
+    client.create_and_sign_transaction({data: cache('dtrustWithdrawal'), keys: [KEYS[0].priv.toString('hex'), KEYS[1].priv.toString('hex')]}).then((f) => {
 	CT.create(test,client).title('Sending in 2-key withdrawal sigs')
 	.method('submit_transaction')
 	.payload({transaction_data: f})
