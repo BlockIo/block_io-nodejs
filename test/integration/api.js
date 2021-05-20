@@ -128,83 +128,53 @@ if (["BTCTEST", "LTCTEST"].indexOf(cache('network')) !== -1) {
 
 cache.require(['minFee', 'newAddress', 'fromAddress', 'fromLabel'], () => {
 
-  CT.create(test, client).title('Withdraw From Address')
-    .method('withdraw_from_address')
+  CT.create(test, client).title('Prepare Transaction From Address')
+    .method('prepare_transaction')
     .payload({
       from_addresses: cache('fromAddress'),
       to_label: NEWLABEL,
-      amount: helper.calcWithdrawalAmount(),
-      pin: PIN
+      amount: helper.calcWithdrawalAmount()
     })
     .succeeds()
-    .returnsTx()
+    .returnsAttrs(['expected_unsigned_txid', 'user_key', 'inputs', 'outputs', 'input_address_data'])
+    .postProcess(args => cache('preparedTransactionFromAddress', args[1]))
     .execute();
 
-  CT.create(test, lowRClient).title('Withdraw From Address (low R)')
-    .method('withdraw_from_address')
-    .payload({
-      from_addresses: cache('fromAddress'),
-      to_label: NEWLABEL,
-      amount: helper.calcWithdrawalAmount(),
-      pin: PIN
-    })
-    .succeeds()
-    .returnsTx()
-    .execute();
-
-  CT.create(test, client).title('Withdraw From Label')
-    .method('withdraw_from_label')
+  CT.create(test, client).title('Prepare Transaction From Label')
+    .method('prepare_transaction')
     .payload({
       from_labels: cache('fromLabel'),
       payment_address: cache('newAddress'),
-      amount: helper.calcWithdrawalAmount(),
-      pin: PIN
+      amount: helper.calcWithdrawalAmount()
     })
     .succeeds()
-    .returnsTx()
+    .returnsAttrs(['expected_unsigned_txid', 'user_key', 'inputs', 'outputs', 'input_address_data'])
     .execute();
 
-  CT.create(test, client).title('Withdraw From Label (without PIN)')
-    .method('withdraw_from_label')
-    .payload({
-      from_labels: cache('fromLabel'),
-      payment_address: cache('newAddress'),
-      amount: helper.calcWithdrawalAmount(),
-    })
-    .fails()
-    .execute();
-
-  if (VERSION == 1) {
-    // stuff that got depreciated with V2
-
-    CT.create(test, client).title('Get address received (by address) [DEPRECIATED]')
-      .method('get_address_received')
-      .payload({ address: cache('fromAddress') })
-      .succeeds()
-      .numericResult('confirmed_received', 'must return confirmed balance')
-      .numericResult('unconfirmed_received', 'must return unconfirmed balance')
-      .execute();
-
-    CT.create(test, client).title('Get address received (by label) [DEPRECIATED]')
-      .method('get_address_received')
-      .payload({ label: cache('fromLabel') })
-      .succeeds()
-      .numericResult('confirmed_received', 'must return confirmed balance')
-      .numericResult('unconfirmed_received', 'must return unconfirmed balance')
-      .execute();
-
-  } else if (VERSION > 1) {
+  cache.require(['preparedTransactionFromAddress'], () => {
+      client.create_and_sign_transaction({data: cache('preparedTransactionFromAddress'), pin: PIN}).then((f,r) => {
+	CT.create(test, client).title('Submit Transaction')
+	  .method('submit_transaction')
+	  .payload({
+             transaction_data: f
+	  })
+	  .succeeds()
+	  .returnsAttrs(['network', 'txid'])
+	  .execute();
+      });
+  });
+    
     // for now, since we only have v2,
     // assume forward compatibility of everything else
 
     CT.create(test, client).title('Validate API key (valid key)')
-      .method('validate_api_key')
+      .method('get_balance')
       .succeeds()
       .returnsAttrs('network')
       .execute();
 
     CT.create(test, badApiKeyClient).title('Validate API key (invalid key)')
-      .method('validate_api_key')
+      .method('get_balance')
       .failsServerSide()
       .execute();
 
@@ -233,17 +203,6 @@ cache.require(['minFee', 'newAddress', 'fromAddress', 'fromLabel'], () => {
       .succeeds()
       .numericResult('available_balance', 'must return available balance')
       .numericResult('pending_received_balance', 'must return pending balance')
-      .execute();
-
-    CT.create(test, pinLessClient).title('Withdraw From Label (for manual signing)')
-      .method('withdraw_from_label')
-      .payload({
-        from_labels: cache('fromLabel'),
-        payment_address: cache('newAddress'),
-        amount: helper.calcWithdrawalAmount()
-      })
-      .succeeds()
-      .returnsAttrs(['reference_id', 'encrypted_passphrase', 'inputs'])
       .execute();
 
     CT.create(test, client).title('Get Received Transactions')
@@ -339,7 +298,5 @@ cache.require(['minFee', 'newAddress', 'fromAddress', 'fromLabel'], () => {
         });
 
     });
-
-  }
 
 });

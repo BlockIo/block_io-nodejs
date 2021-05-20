@@ -203,19 +203,19 @@ cache.require([
     .execute();
 
   CT.create(test, client).title('Withdraw from DTrust Address')
-    .method('withdraw_from_dtrust_address')
+    .method('prepare_dtrust_transaction')
     .payload({
       from_addresses: cache('fromDTrustAddress'),
       to_label: DTRUSTLABEL,
-      amount: helper.calcDTrustWithdrawalAmount(),
-      pin: PIN })
+      amount: helper.calcDTrustWithdrawalAmount()
+    })
     .succeeds()
-    .returnsAttrs(['reference_id', 'inputs'])
+    .returnsAttrs(['expected_unsigned_txid', 'inputs', 'outputs', 'input_address_data'])
     .check((t, args) => t.ok(
-      args[1].data.encrypted_passphrase === null,
+      args[1].data.user_key === undefined,
       'must not return an encrypted passphrase'))
     .check((t, args) => t.equal(
-      args[1].data.inputs.filter(i => i.signatures_needed != REQUIRED_SIGS).length,
+      args[1].data.input_address_data.filter(i => i.required_signatures != REQUIRED_SIGS+1).length, // +1 because Block.io added a required signature when we created the address
       0, 'must require the correct amounts of sigs'))
     .postProcess(args => cache('dtrustWithdrawal', args[1]))
     .execute();
@@ -223,39 +223,39 @@ cache.require([
 });
 
 cache.require(['dtrustWithdrawal'], () => {
+    client.create_and_sign_transaction({data: cache('dtrustWithdrawal'), keys: [KEYS[0].priv.toString('hex'), KEYS[1].priv.toString('hex')]}).then((f,r) => {
+	CT.create(test,client).title('Sending in 2-key withdrawal sigs')
+	.method('submit_transaction')
+	.payload({transaction_data: f})
+	.succeeds()
+	.returnsAttrs(['network', 'txid'])
+	.execute();
+    });
+});
+
+/* TODO more dTrust integration tests with submit_transaction */
+/*
+cache.require(['dtrustWithdrawal'], () => {
 
   const w = cache('dtrustWithdrawal');
-  w.data.inputs = BlockIo.helper.signInputs(KEYS[0], w.data.inputs);
 
+    client.create_and_sign_transaction({data: w, keys: [KEYS[0].priv.toString('hex')]}).then((f,r) => {
+
+  // sign with 1 key
   CT.create(test, client).title('Sending in single-key withdrawal sigs with low R')
-  .method('sign_and_finalize_withdrawal')
-  .payload({ signature_data: JSON.stringify(w.data) })
-  .succeeds()
-  .check((t, args) => t.equal(
-    args[1].data.reference_id, w.data.reference_id,
-    'must return the correct reference ID'))
-  .check((t, args) => t.equal(
-    args[1].data.inputs.filter(i => i.signatures_needed != REQUIRED_SIGS -1).length,
-    0, 'must have decreased the amount of required sigs'))
+  .method('submit_transaction')
+  .payload({ transaction_data: f })
+//  .failsServerSide()
   .execute();
 
-  // sign with second key
-  w.data.inputs = BlockIo.helper.signInputs(KEYS[2], w.data.inputs);
-  CT.create(test, client).title('Sending in 2-key withdrawal sigs')
-  .method('sign_and_finalize_withdrawal')
-  .payload({ signature_data: JSON.stringify(w.data) })
+  // sign with all keys
+  const s2 = client.create_and_sign_transaction({data: w, keys: KEYS.map(key => key.priv.toString('hex');)});
+  CT.create(test, client).title('Sending in 3-key withdrawal sigs')
+  .method('submit_transaction')
+  .payload({ transaction_data: s3 })
   .succeeds()
   .returnsTx()
   .execute();
 
-  // clear all sigs and resign with key 0
-  w.data.inputs.forEach(i => i.signers.forEach(s => s.signed_data = null));
-  w.data.inputs = BlockIo.helper.signInputs(KEYS[0], w.data.inputs);
-
-  CT.create(test, client).title('Sending in an already finished withdrawal')
-  .method('sign_and_finalize_withdrawal')
-  .payload({ signature_data: JSON.stringify(w.data) })
-  .failsServerSide()
-  .execute();
-
 });
+*/

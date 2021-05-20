@@ -1,6 +1,6 @@
 # BlockIo
 
-This nodejs module is the official reference SDK for the Block.io payments
+This NodeJS module is the official reference SDK for the Block.io payments
 API. To use this, you will need the Bitcoin, Litecoin or Dogecoin API key(s)
 from <a href="https://block.io" target="_blank">block.io</a>. Go ahead, sign
 up :)
@@ -13,13 +13,9 @@ Install the package using npm:
 npm install block_io
 ```
 
-### Support for older node.js versions
+### Supported NodeJS versions
 
-Currently, only node.js versions 10.0 and higher are supported.
-
-For node.js < 10.0.0, please use: `npm install block_io@2.0.3`
-
-For node.js < 5.10.0, please use: `npm install block_io@1.0.9-5`
+Currently, only NodeJS versions 10.0 and higher are supported. We aim to support only NodeJS  LTS versions.
 
 ## Usage
 
@@ -37,21 +33,38 @@ async function example() {
   try {
     // print the account balance
     let balance = await block_io.get_balance();
-    console.log(balance);
+    console.log(JSON.stringify(balance,null,2));
 
-    // print all addresses on this account
+    // print first page of unarchived addresses on this account
     let addresses = await block_io.get_my_addresses();
-    console.log(addresses);
+    console.log(JSON.stringify(addresses,null,2));
 
-    // withdrawal; we specify the PIN here
-    let withdraw = await block_io.withdraw({
-      pin: 'SECRET_PIN',
+    // withdrawal:
+    //   prepare_transaction ->
+    //   summarize_prepared_transaction ->
+    //   create_and_sign_transaction ->
+    //   submit_transaction
+    let prepared_transaction = await block_io.prepare_transaction({
       from_labels: 'label1,label2',
       to_label: 'label3',
       amount: '50.0'
     });
-    console.log(withdraw);
 
+    // inspect the prepared data for yourself. here's a
+    // summary of the transaction you will create and sign
+    let summarized_transaction = await block_io.summarize_prepared_transaction({data: prepared_transaction});
+    console.log(JSON.stringify(summarized_transaction,null,2));
+    
+    // create and sign this transaction:
+    // we specify the PIN here to decrypt
+    // the private key to sign the transaction
+    let signed_transaction = await block_io.create_and_sign_transaction({data: prepared_transaction, pin: 'SECRET_PIN'});
+
+    // inspect the signed transaction yourself
+    // once satisfied, submit it to Block.io
+    let result = await block_io.submit_transaction({transaction_data: signed_transaction});
+    console.log(JSON.stringify(result,null,2)); // contains the transaction ID of the final transaction
+    
   } catch (error) {
     console.log("Error:", error.message);
   }
@@ -68,7 +81,7 @@ Since v3.0.0, all methods return promises, like so:
 ```javascript
 
 block_io.get_balance()
-        .then(data => console.log(JSON.stringify(data)))
+        .then(data => console.log(JSON.stringify(data,null,2)))
         .catch(error => console.log("Error:", error.message));
 
 ```
@@ -82,22 +95,12 @@ Just add a callback function/lambda as the last argument.
 
 block_io.get_balance((error, data) => {
   if (error) return console.log("Error:", error.message);
-  console.log(JSON.stringify(data));
-}
-
-block_io.withdraw({
-  pin: 'SECRET_PIN',
-  from_labels: 'label1,label2',
-  to_label: 'label3',
-  amount: '50.0'
-}, function (error, data) {
-  if (error) return console.log("Error:", error.message);
-  console.log(JSON.stringify(data));
+  console.log(JSON.stringify(data,null,2));
 });
 
 ```
 
-For more information, see [Node.js API Docs](https://block.io/api/nodejs).
+For more information, see [NodeJS API Docs](https://block.io/api/nodejs).
 This client provides a mapping for all methods listed on the Block.io API
 site.
 
@@ -113,11 +116,9 @@ const config = {
   api_key: "YOUR_API_KEY",
   version: 2,              // REST API version to use. Default: 2
   options: {
-    allowNoPin: false,     // Allow ommission of PIN for withdrawal. This makes
-                           // withdrawal functions return inputs to sign
-                           // outside of the client, rather than sign them
-                           // intrinsically. This is useful when interfacing
-                           // with hardware wallets and HSMs. Default: false.
+    allowNoPin: false,     // Allow ommission of PIN for withdrawal.
+                           // This may be useful when interfacing with
+                           // hardware wallets and HSMs. Default: false.
 
     lowR: true,            // Sign with a low R value to save a byte and
                            // make signature size more predictable, at the
