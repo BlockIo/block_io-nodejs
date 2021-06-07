@@ -16,6 +16,17 @@ test('Deriving a PIN into an AES key', t => {
 
 });
 
+test('Deriving a PIN into an AES key with Salt', t => {
+  t.plan(2);
+
+    t.doesNotThrow(() => {
+	// (pin, salt, iterations, hash_function, phase1_key_length, phase2_key_length)
+	const key = CryptoHelper.pinToKey("deadbeef", "922445847c173e90667a19d90729e1fb", 500000);
+	t.equal(Buffer.from(key, "base64").toString("hex"), "f206403c6bad20e1c8cb1f3318e17cec5b2da0560ed6c7b26826867452534172", 'must return the correct derived key');
+  }, undefined, 'must not throw any Errors');
+
+});
+
 test('Encrypting some data', t => {
   t.plan(2);
 
