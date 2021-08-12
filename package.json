@@ -9,7 +9,7 @@
     "dogecoin",
     "wallet"
   ],
-  "version": "4.0.2",
+  "version": "4.0.3",
   "preferGlobal": false,
   "homepage": "https://github.com/BlockIo/block_io-nodejs",
   "author": "Patrick Lodder <patrick.lodder@gmail.com> (https://github.com/patricklodder)",
@@ -29,8 +29,8 @@
     "pbkdf2": "^3.1.2"
   },
   "devDependencies": {
-    "eslint": "^7.26.0",
-    "tape": "^5.2.2"
+    "eslint": "^7.32.0",
+    "tape": "^5.3.1"
   },
   "scripts": {
     "test": "node test/unit/cryptohelper.js && node test/unit/key.js && node test/unit/bitcoinjs-lib.js && node test/unit/prepare_transaction.js && npx eslint ."
