@@ -1,14 +1,19 @@
 const test = require('tape');
-const HttpsClient = require('../../lib/httpsclient');
+const BlockIo = require('../../lib/block_io');
 
 test('HTTPS Client: connecting to host', t => {
   t.plan(2);
 
-  const client = new HttpsClient(undefined, 'random/0.01');
+  const client = new BlockIo({
+    api_key: "0000-0000-0000-0000",
+    version: 2,
+    pin: 'unused',
+  });
 
   t.doesNotThrow(() => {
-    client.request('GET', 'https://block.io/api/v2/get_balance', {})
-          .then(data => t.equal(data.res.statusCode, 404, 'must return 404 status'));
+    client.get_balance({})
+          .then(data => console.log(data))
+          .catch(r => t.equal(r.data.status, 'fail', 'must return JSON object with status fail'));
   }, undefined, 'must not throw any Errors');
   
 });
