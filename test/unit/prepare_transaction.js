@@ -442,3 +442,18 @@ test('prepare_transaction_response_with_blockio_fee_and_expected_unsigned_txid.j
 
 });
 
+test('prepare_transaction_response_witness_v1_output.json', t => {
+    
+    const prepare_transaction_response = read_json_file("../../data/test-cases/json/prepare_transaction_response_witness_v1_output.json");
+    const create_and_sign_transaction_response = read_json_file("../../data/test-cases/json/create_and_sign_transaction_response_witness_v1_output.json");
+
+    t.plan(1);
+
+    client.create_and_sign_transaction({data: prepare_transaction_response}).then((f) => {
+	t.deepEqual(f,create_and_sign_transaction_response);	
+    }).catch((r) => {
+	t.equal(typeof(r),'undefined', "should not throw exception");
+    });
+
+});
+
