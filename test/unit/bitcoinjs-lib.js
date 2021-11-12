@@ -2,12 +2,13 @@
 
 const test = require('tape');
 const bitcoin = require('bitcoinjs-lib');
+const ecpair = require('ecpair');
 
 const KEYS = ["ef4fc6cfd682494093bbadf041ba4341afbe22b224432e21a4bc4470c5b939d4",
               "123f37eb9a7f24a120969a1b2d6ac4859fb8080cfc2e8d703abae0f44305fc12"];
 
-const PUBLIC_KEYS = [bitcoin.ECPair.fromPrivateKey(Buffer.from(KEYS[0], 'hex')).publicKey.toString('hex'),
-                     bitcoin.ECPair.fromPrivateKey(Buffer.from(KEYS[1], 'hex')).publicKey.toString('hex')];
+const PUBLIC_KEYS = [ecpair.ECPair.fromPrivateKey(Buffer.from(KEYS[0], 'hex')).publicKey.toString('hex'),
+                     ecpair.ECPair.fromPrivateKey(Buffer.from(KEYS[1], 'hex')).publicKey.toString('hex')];
 
 const LTCTEST = {
     messagePrefix: '\x19Litecoin Signed Message:\n',
@@ -22,9 +23,9 @@ const LTCTEST = {
 };
 
 // these keys will use low R signatures
-const KEY1 = bitcoin.ECPair.fromPrivateKey(Buffer.from(KEYS[0], 'hex'));
+const KEY1 = ecpair.ECPair.fromPrivateKey(Buffer.from(KEYS[0], 'hex'));
 KEY1.lowR = true;
-const KEY2 = bitcoin.ECPair.fromPrivateKey(Buffer.from(KEYS[1], 'hex'));
+const KEY2 = ecpair.ECPair.fromPrivateKey(Buffer.from(KEYS[1], 'hex'));
 KEY2.lowR = true;
 
 const REDEEM_SCRIPT = bitcoin.payments.p2ms({m: 2, pubkeys: [Buffer.from(PUBLIC_KEYS[0], 'hex'), Buffer.from(PUBLIC_KEYS[1], 'hex')], network: LTCTEST});
