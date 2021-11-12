@@ -15,7 +15,7 @@ npm install block_io
 
 ### Supported NodeJS versions
 
-Currently, only NodeJS versions 10.0 and higher are supported. We aim to support only NodeJS  LTS versions.
+Currently, only NodeJS versions 12.0 and higher are supported. We aim to support only NodeJS LTS versions.
 
 ## Usage
 
