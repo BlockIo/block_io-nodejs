@@ -25,13 +25,13 @@
   },
   "main": "./lib/block_io.js",
   "dependencies": {
-    "bitcoinjs-lib": "^6.0.0",
+    "bitcoinjs-lib": "^6.0.2",
     "ecpair": "^1.0.1",
     "pbkdf2": "^3.1.2"
   },
   "devDependencies": {
-    "eslint": "^7.32.0",
-    "tape": "^5.3.1"
+    "eslint": "^8.23.0",
+    "tape": "^5.6.0"
   },
   "scripts": {
     "test": "node test/unit/cryptohelper.js && node test/unit/key.js && node test/unit/bitcoinjs-lib.js && node test/unit/prepare_transaction.js && node test/unit/httpsclient.js && npx eslint ."
