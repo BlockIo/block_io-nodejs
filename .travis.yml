@@ -10,7 +10,5 @@ node_js:
   - 14
   - 15
   - 16
-matrix:
-  include:
-    - node_js: 17
-      env: NODE_OPTIONS=--openssl-legacy-provider
+  - 17
+  - 18
