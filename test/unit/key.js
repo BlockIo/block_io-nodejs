@@ -12,6 +12,20 @@ const PASSPHRASE = 'deadbeeffeedface';
 const PASS_PRIV = 'ae9f07f3d627531db09562bbabad4c5e023f6505b4b06122730744261953e48f';
 const PASS_PUB = '029023d9738c623cdd7e5fdd0f41666accb82f21df5d27dc5ef07040f7bdc5d9f5';
 
+test('Creates new ECKey from Buffer', t => {
+  t.plan(1);
+    let key = new Key(Buffer.from(PRIVKEY, 'hex'));
+    t.equals(key.pub.toString('hex'), PUBKEY, 'must return correct public key');
+});
+
+test('ECKey generates new keys', t => {
+  t.plan(1);
+  let key1 = Key.makeRandom().pub.toString('hex');
+  let key2 = Key.makeRandom().pub.toString('hex');
+
+  t.notEquals(key1, key2, 'must generate random keys');
+});
+
 test('ECKey extensions: deriving a pubkey from hex', t => {
   t.plan(2);
 
