@@ -21,6 +21,15 @@ const addressLabel = 'dtrust' + crypto.randomBytes(4).toString('hex');
 
 // create the private key objects for each private key
 // NOTE: in production environments you'll do this elsewhere
+// WARNING: this is just a demo. DO NOT USE THESE KEYS IN PRODUCTION! Generate new keys using BlockIo.ECKey.makeRandom() or elsewhere:
+//   let key1 = BlockIo.ECKey.makeRandom();
+//   key1.pub.toString('hex');
+//   key1.priv.toString('hex'); // store this somewhere safe!
+//   let key2 = ...
+//   let saved_key1 = BlockIo.ECKey.fromHex(key1.priv.toString('hex'));
+//   let saved_key2 = ...
+//   const privKeys = [ saved_key1, saved_key2, saved_key3, saved_key4 ]
+
 const privKeys = [
   BlockIo.ECKey.fromPassphraseString('verysecretkey1'),
   BlockIo.ECKey.fromPassphraseString('verysecretkey2'),
