@@ -1,4 +1,5 @@
 node_modules
 blockio.min.js
+package-lock.json
 tmp
 *~
