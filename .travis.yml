@@ -1,7 +1,5 @@
 dist: focal
 language: node_js
-before_script:
-  - if [ $TRAVIS_NODE_VERSION = '12' || $TRAVIS_NODE_VERSION = '13' || $TRAVIS_NODE_VERSION = '17' ]; then npm install -g npm@8; else npm install -g npm; fi
 script:
   - npm --version
   - npm test
