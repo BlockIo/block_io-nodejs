@@ -9,7 +9,7 @@
     "dogecoin",
     "wallet"
   ],
-  "version": "4.2.3",
+  "version": "4.2.2",
   "preferGlobal": false,
   "homepage": "https://github.com/BlockIo/block_io-nodejs",
   "author": "Patrick Lodder <patrick.lodder@gmail.com> (https://github.com/patricklodder)",
@@ -25,7 +25,7 @@
   },
   "main": "./lib/block_io.js",
   "dependencies": {
-    "axios": "^1.2.5",
+    "axios": "^1.5.1",
     "bitcoinjs-lib": "^6.1.5",
     "ecpair": "^2.1.0",
     "pbkdf2": "^3.1.2",
@@ -40,6 +40,6 @@
   },
   "license": "MIT",
   "engines": {
-    "node": "^21 || ^20 || ^19 || ^18 || ^17 || ^16 || ^15 || ^14 || ^13 || ^12"
+    "node": "^21 || ^20 || ^19 || ^18 || ^17 || ^16 || ^14"
   }
 }
